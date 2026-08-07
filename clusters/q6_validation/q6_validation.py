@@ -1,6 +1,7 @@
 from ovito_utils import load_frame
 from freud_methods import *
 from pyscal_methods import *
+from q6_functions import *
 from plots import *
 from ovito.modifiers import ChillPlusModifier
 import config
@@ -50,95 +51,6 @@ with open(config.txt_file, 'w') as out:
     out.write(f"{'=' * 20}\n\n")
 
 
-def find_largest_clusters(filename):
-    cluster_sizes = {}
-    with open(filename, 'r') as f:
-        while True:
-            line = f.readline()
-
-            if not line:
-                break
-            if line.strip() == "ITEM: TIMESTEP":
-                timestep = int(f.readline().strip())
-            
-                f.readline()
-                num_atoms = int(float(f.readline().strip()))
-
-                f.readline()
-                f.readline()
-                f.readline()
-                f.readline()
-                f.readline()
-
-                cluster_sizes = {}
-
-                for i in range(num_atoms):
-                    line = f.readline()
-                    cluster_id = int(float(line.split()[5]))
-                    cluster_sizes[cluster_id] = (cluster_sizes.get(cluster_id, 0) + 1)
-    top4 = sorted(
-        cluster_sizes.items(),
-        key=lambda x: x[1],
-        reverse=True
-    )[:4]
-
-    return top4 
-
-
-
-def get_cluster_members(filename):
-    cluster_members = {}
-
-    with open(filename, 'r') as f:
-        while True:
-            line = f.readline()
-
-            if not line:
-                break
-
-            if line.strip() == "ITEM: TIMESTEP":
-
-                timestep = int(f.readline().strip())
-
-                f.readline()
-                num_atoms = int(float(f.readline().strip()))
-
-                for _ in range(5):
-                    f.readline()
-
-                cluster_members = {}
-
-                for _ in range(num_atoms):
-
-                    line = f.readline().split()
-
-                    cid = int(float(line[5]))
-                    atom_id = int(float(line[0]))
-
-                    if cid not in cluster_members:
-                        cluster_members[cid] = set()
-
-                    cluster_members[cid].add(atom_id)
-
-    return cluster_members
-
-
-def find_matching_cluster(target_atoms, cluster_members, min_overlap=1):
-    best_cluster = None
-    best_overlap = 0
-
-    for cluster_id, members in cluster_members.items():
-
-        overlap = len(target_atoms & members)
-
-        if overlap > best_overlap:
-            best_overlap = overlap
-            best_cluster = cluster_id
-
-    if best_overlap < min_overlap:
-        return None, best_overlap
-
-    return best_cluster, best_overlap
 
 
 with open(config.dump, 'r') as f:
