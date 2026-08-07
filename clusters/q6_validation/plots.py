@@ -110,7 +110,6 @@ def plot_maxs(timesteps, lammps, cutoff,cutoff_avg, voronoi, voronoi_avg):
     plt.close()
 
 
-
 def plot_final_q6_vs_q4(final_results):
     fig, axs = plt.subplots(2, 2,figsize=(12, 10),sharex=True,sharey=True)
     methods = ["Cutoff","Cutoff Averaged","Voronoi","Voronoi Averaged"]

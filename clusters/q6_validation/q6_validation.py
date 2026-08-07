@@ -9,9 +9,9 @@ import os
 
 
 
-timesteps = []
+#timesteps = []
 
-lammps_q6_timestep = []
+'''lammps_q6_timestep = []
 
 lammps_q6_maxs = []
 lammps_q6_avgs = []
@@ -30,7 +30,7 @@ voronoi_avg_maxs = []
 
 largest_cluster_size = []
 largest_cluster_q6_freud = []
-largest_cluster_q6_pyscal = []
+largest_cluster_q6_pyscal = []'''
 
 final_results = {
     "labels": None,
@@ -142,15 +142,15 @@ def find_matching_cluster(target_atoms, cluster_members, min_overlap=1):
 
 
 with open(config.dump, 'r') as f:
-    top4 = find_largest_clusters(config.dump)
-    top4_ids = [cid for cid, size in top4]
-    top4_atoms = {}
+    #top4 = find_largest_clusters(config.dump)
+    #top4_ids = [cid for cid, size in top4]
+    #top4_atoms = {}
 
-    final_cluster_members = get_cluster_members(config.dump)
-    for cid in top4_ids:
-        top4_atoms[cid] = final_cluster_members[cid]
+    #final_cluster_members = get_cluster_members(config.dump)
+    #for cid in top4_ids:
+        #top4_atoms[cid] = final_cluster_members[cid]
 
-    cluster_history_4 = {
+    '''cluster_history_4 = {
     cid: {
         "time": [],
         "size": [],
@@ -160,7 +160,7 @@ with open(config.dump, 'r') as f:
         "voronoi": [],
         "voronoi_avg": [],
         "phase": []
-    }for cid in top4_ids}
+    }for cid in top4_ids}'''
 
     while True:
         line = f.readline()
@@ -169,7 +169,7 @@ with open(config.dump, 'r') as f:
             break
         if line.strip() == "ITEM: TIMESTEP":
             timestep = int(f.readline().strip())
-            timesteps.append(timestep)
+            #timesteps.append(timestep)
         
             f.readline()
             num_atoms = int(float(f.readline().strip()))
@@ -180,33 +180,33 @@ with open(config.dump, 'r') as f:
             f.readline()
             f.readline()
 
-            lammps_q6_timestep = []
+            #lammps_q6_timestep = []
             cluster_ids = []
-            atom_ids = []
+            #atom_ids = []
 
             for i in range(num_atoms):
                 line = f.readline()
 
-                atom_id = int(float(line.split()[0]))
+                #atom_id = int(float(line.split()[0]))
                 cluster_id = int(float(line.split()[5]))
-                atom_ids.append(atom_id)
+                #atom_ids.append(atom_id)
                 cluster_ids.append(cluster_id)
 
-                q6 = float(line.split()[6])
-                lammps_q6_timestep.append(q6)
+                #q6 = float(line.split()[6])
+                #lammps_q6_timestep.append(q6)
 
 
-            current_cluster_members = {}
+            '''current_cluster_members = {}
 
             for atom_id, cid in zip(atom_ids, cluster_ids):
                 if cid not in current_cluster_members:
                     current_cluster_members[cid] = set()
-                current_cluster_members[cid].add(atom_id)
+                current_cluster_members[cid].add(atom_id)'''
             
             ids, positions, box, labels = load_frame(config.dump, frame, True)
 
-            cluster_lammps = average_q6_per_cluster(lammps_q6_timestep,cluster_ids)
-            lammps_cluster_q6 = [c["avg_q6"]for c in cluster_lammps.values()]
+            #cluster_lammps = average_q6_per_cluster(lammps_q6_timestep,cluster_ids)
+            #lammps_cluster_q6 = [c["avg_q6"]for c in cluster_lammps.values()]
             
 
             #CUTOFF
@@ -219,9 +219,9 @@ with open(config.dump, 'r') as f:
             cluster_freud_cutoff_q4 = average_q4_per_cluster(freud_cutoff_q4,cluster_ids)
             cutoff_cluster_q4 = [c["avg_q4"]for c in cluster_freud_cutoff_q4.values()]
 
-            pyscal_cutoff = pyscal_steinhardt(positions, box) # calculate all q6s with pyscal
+            '''pyscal_cutoff = pyscal_steinhardt(positions, box) # calculate all q6s with pyscal
             cluster_pyscal_cutoff = average_q6_per_cluster(pyscal_cutoff,cluster_ids) # make the dictionary
-            pyscal_cutoff_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_cutoff.values()] # extract q6s
+            pyscal_cutoff_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_cutoff.values()] # extract q6s'''
 
 
 
@@ -234,15 +234,15 @@ with open(config.dump, 'r') as f:
             cluster_freud_cutoff_avg_q4 = average_q4_per_cluster(freud_cutoff_avg_q4,cluster_ids)
             cutoff_cluster_avg_q4 = [c["avg_q4"]for c in cluster_freud_cutoff_avg_q4.values()]
 
-            pyscal_cutoff_avg = pyscal_steinhardt(positions, box, averaged=True)
+            '''pyscal_cutoff_avg = pyscal_steinhardt(positions, box, averaged=True)
             cluster_pyscal_cutoff_avg = average_q6_per_cluster(pyscal_cutoff_avg,cluster_ids)
-            pyscal_cutoff_avg_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_cutoff_avg.values()]
+            pyscal_cutoff_avg_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_cutoff_avg.values()]'''
 
             # stuff for plotting largest cluster size vs q6 for freud and pyscal similar to paper
-            largest_cluster_id, largest_cluster = max(cluster_lammps.items(),key=lambda item: item[1]["size"])
+            '''largest_cluster_id, largest_cluster = max(cluster_lammps.items(),key=lambda item: item[1]["size"])
             largest_cluster_size.append(cluster_lammps[largest_cluster_id]["size"])
             largest_cluster_q6_freud.append(cluster_freud_cutoff_avg[largest_cluster_id]["avg_q6"])
-            largest_cluster_q6_pyscal.append(cluster_pyscal_cutoff_avg[largest_cluster_id]["avg_q6"])
+            largest_cluster_q6_pyscal.append(cluster_pyscal_cutoff_avg[largest_cluster_id]["avg_q6"])'''
 
 
             #VORONOI
@@ -254,9 +254,9 @@ with open(config.dump, 'r') as f:
             cluster_freud_voronoi_q4 = average_q4_per_cluster(freud_voronoi_q4,cluster_ids)
             voronoi_cluster_q4 = [c["avg_q4"]for c in cluster_freud_voronoi_q4.values()]
 
-            pyscal_voronoi = pyscal_steinhardt(positions, box, method='voronoi')
+            '''pyscal_voronoi = pyscal_steinhardt(positions, box, method='voronoi')
             cluster_pyscal_voronoi  = average_q6_per_cluster(pyscal_voronoi,cluster_ids)
-            pyscal_vornoi_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi.values()]
+            pyscal_vornoi_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi.values()]'''
 
 
             # VORONOI AVERAGED
@@ -268,11 +268,11 @@ with open(config.dump, 'r') as f:
             cluster_freud_voronoi_avg_q4 = average_q4_per_cluster(freud_voronoi_avg_q4,cluster_ids)
             voronoi_cluster_avg_q4 = [c["avg_q4"]for c in cluster_freud_voronoi_avg_q4.values()]
             
-            pyscal_voronoi_avg = pyscal_steinhardt(positions, box, method='voronoi', averaged=True)
+            '''pyscal_voronoi_avg = pyscal_steinhardt(positions, box, method='voronoi', averaged=True)
             cluster_pyscal_voronoi_avg  = average_q6_per_cluster(pyscal_voronoi_avg,cluster_ids)
-            pyscal_vornoi_avg_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi_avg.values()]
+            pyscal_vornoi_avg_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi_avg.values()]'''
 
-            lammps_q6_maxs.append(max(lammps_cluster_q6))
+            '''lammps_q6_maxs.append(max(lammps_cluster_q6))
             lammps_q6_avgs.append(sum(lammps_cluster_q6)/len(lammps_cluster_q6))
 
             cutoff_maxs.append(max(cutoff_cluster_q6))
@@ -285,7 +285,7 @@ with open(config.dump, 'r') as f:
             voronoi_avgs.append(sum(voronoi_cluster_q6)/len(voronoi_cluster_q6))
 
             voronoi_avg_maxs.append(max(voronoi_avg_cluster_q6))
-            voronoi_avg_avgs.append(sum(voronoi_avg_cluster_q6)/len(voronoi_avg_cluster_q6))
+            voronoi_avg_avgs.append(sum(voronoi_avg_cluster_q6)/len(voronoi_avg_cluster_q6))'''
 
 
             final_results["Cutoff"]["q4"] = cutoff_cluster_q4
@@ -309,7 +309,7 @@ with open(config.dump, 'r') as f:
             with open(config.txt_file, 'a') as out:
                 out.write(f"Timestep: {timestep}\n\n")
 
-                out.write(f"LAMMPS\n")
+                '''out.write(f"LAMMPS\n")
                 out.write(f"Max: {lammps_q6_maxs[-1]}\n")
                 out.write(f"Avg: {lammps_q6_avgs[-1]}\n\n")
 
@@ -343,9 +343,9 @@ with open(config.dump, 'r') as f:
 
                 out.write(f"PYSCAL VORONOI AVERAGED\n")
                 out.write(f"Max: {max(pyscal_vornoi_avg_cluster_q6)}\n")
-                out.write(f"Avg: {sum(pyscal_vornoi_avg_cluster_q6) / len(pyscal_vornoi_avg_cluster_q6)}\n\n")
+                out.write(f"Avg: {sum(pyscal_vornoi_avg_cluster_q6) / len(pyscal_vornoi_avg_cluster_q6)}\n\n")'''
 
-            for original_cid in top4_ids:
+            '''for original_cid in top4_ids:
                 target_atoms = top4_atoms[original_cid]
                 valid_cluster_members = {cid: members for cid, members in current_cluster_members.items() if cid in cluster_lammps}
                 matched_cid, overlap = find_matching_cluster(target_atoms,valid_cluster_members)
@@ -379,10 +379,10 @@ with open(config.dump, 'r') as f:
                 cluster_history_4[original_cid]["cutoff_avg"].append(cluster_freud_cutoff_avg[matched_cid]["avg_q6"])
                 cluster_history_4[original_cid]["voronoi"].append(cluster_freud_voronoi[matched_cid]["avg_q6"])
                 cluster_history_4[original_cid]["voronoi_avg"].append(cluster_freud_voronoi_avg[matched_cid]["avg_q6"])
-                cluster_history_4[original_cid]["phase"].append(dominant_phase)
+                cluster_history_4[original_cid]["phase"].append(dominant_phase)'''
 
-plot_avgs(timesteps,lammps_q6_avgs, cutoff_avgs, cutoff_avg_avgs, voronoi_avgs, voronoi_avg_avgs)
-plot_maxs(timesteps,lammps_q6_maxs, cutoff_maxs, cutoff_avg_maxs, voronoi_maxs, voronoi_avg_maxs)
-plot_cluster_q6_history(cluster_history_4)
-plot_q6_largest_cluster_freud_pyscal(largest_cluster_size, largest_cluster_q6_freud, largest_cluster_q6_pyscal)
+#plot_avgs(timesteps,lammps_q6_avgs, cutoff_avgs, cutoff_avg_avgs, voronoi_avgs, voronoi_avg_avgs)
+#plot_maxs(timesteps,lammps_q6_maxs, cutoff_maxs, cutoff_avg_maxs, voronoi_maxs, voronoi_avg_maxs)
+#plot_cluster_q6_history(cluster_history_4)
+#plot_q6_largest_cluster_freud_pyscal(largest_cluster_size, largest_cluster_q6_freud, largest_cluster_q6_pyscal)
 plot_final_q6_vs_q4(final_results)
