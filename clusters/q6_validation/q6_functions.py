@@ -1,5 +1,34 @@
 import numpy as np
 
+def find_last_timestep(filename):
+    final_timestep = None
+    with open(filename, 'r') as f:
+        while True:
+            line = f.readline()
+
+            if not line:
+                break
+            if line.strip() == "ITEM: TIMESTEP":
+                timestep = int(f.readline().strip())
+                final_timestep = timestep
+            
+                f.readline()
+                num_atoms = int(float(f.readline().strip()))
+
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+
+                cluster_sizes = {}
+
+                for i in range(num_atoms):
+                    line = f.readline()
+    return final_timestep
+                
+                
+
 def find_largest_clusters(filename):
     cluster_sizes = {}
     with open(filename, 'r') as f:
