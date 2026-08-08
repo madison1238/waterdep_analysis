@@ -108,9 +108,33 @@ def plot_maxs(timesteps, lammps, cutoff,cutoff_avg, voronoi, voronoi_avg):
     plt.tight_layout()
     plt.savefig(f'{config.output}/max_q6.png')
     plt.close()
+    
 
 
-def plot_final_q6_vs_q4(final_results):
+
+def plot_final_q6_vs_q4_simple(final_results):
+    fig, axs = plt.subplots(2, 2,figsize=(12, 10),sharex=True,sharey=True)
+    methods = ["Cutoff","Cutoff Averaged","Voronoi","Voronoi Averaged"]
+    axs = axs.flatten()
+    for ax, method in zip(axs, methods):
+        q4 = final_results[method]["q4"]
+        q6 = final_results[method]["q6"]
+        cluster_ids = q4.keys()
+        q4_values = [q4[cid] for cid in cluster_ids]
+        q6_values = [q6[cid] for cid in cluster_ids]
+        ax.scatter(q6_values,q4_values,s=8,alpha=0.5)
+
+        ax.set_title(method)
+
+    fig.supxlabel("q6", y=0.06)
+    fig.supylabel("q4")
+
+    plt.tight_layout(rect=[0.05, 0.05, 1, 1])
+    plt.savefig(f"{config.output}/q4_vs_q6_simple.png",bbox_inches="tight")
+
+    plt.close()
+
+def plot_final_q6_vs_q4_color(final_results):
     phase_colors = {
         "liquid": "blue",
         "ice_ih": "red",
@@ -140,7 +164,7 @@ def plot_final_q6_vs_q4(final_results):
             q6_values = []
 
             for cluster_id in q4:
-                if final_results[phase][cluster_id]== phase:
+                if final_results['phase'][cluster_id]== phase:
 
                     q4_values.append(q4[cluster_id])
                     q6_values.append(q6[cluster_id])
@@ -153,5 +177,5 @@ def plot_final_q6_vs_q4(final_results):
     handles, legend_labels = axs[0].get_legend_handles_labels()
     fig.legend(handles,legend_labels,loc="lower center",bbox_to_anchor=(0.5, 0.01),ncol=3,fontsize=11,markerscale=3)
     plt.tight_layout(rect=[0.05, 0.12, 1, 1])
-    plt.savefig(f"{config.output}/q4_vs_q6.png",bbox_inches="tight")
+    plt.savefig(f"{config.output}/q4_vs_q6_color.png",bbox_inches="tight")
     plt.close()
