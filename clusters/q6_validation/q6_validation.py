@@ -50,7 +50,7 @@ with open(config.txt_file, 'w') as out:
     out.write("Q6 SUMMARY\n")
     out.write(f"{'=' * 20}\n\n")
 
-final_timestep = find_last_timestep(config.dump)
+final_timestep,final_frame = find_last_timestep(config.dump)
 
 
 with open(config.dump, 'r') as f:
@@ -119,7 +119,7 @@ with open(config.dump, 'r') as f:
                     current_cluster_members[cid] = set()
                 current_cluster_members[cid].add(atom_id)'''
             
-            ids, positions, box, labels = load_frame(config.dump, frame, True)
+            ids, positions, box, labels = load_frame(config.dump, final_frame, True)
 
             #cluster_lammps = average_q6_per_cluster(lammps_q6_timestep,cluster_ids)
             #lammps_cluster_q6 = [c["avg_q6"]for c in cluster_lammps.values()]

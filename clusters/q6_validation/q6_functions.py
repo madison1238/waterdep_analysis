@@ -1,6 +1,7 @@
 import numpy as np
 
 def find_last_timestep(filename):
+    final_frame = -1
     final_timestep = None
     with open(filename, 'r') as f:
         while True:
@@ -11,6 +12,7 @@ def find_last_timestep(filename):
             if line.strip() == "ITEM: TIMESTEP":
                 timestep = int(f.readline().strip())
                 final_timestep = timestep
+                final_frame += 1
             
                 f.readline()
                 num_atoms = int(float(f.readline().strip()))
@@ -21,11 +23,9 @@ def find_last_timestep(filename):
                 f.readline()
                 f.readline()
 
-                cluster_sizes = {}
-
                 for i in range(num_atoms):
                     line = f.readline()
-    return final_timestep
+    return final_timestep, final_frame
                 
                 
 
