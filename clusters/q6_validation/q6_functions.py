@@ -127,10 +127,10 @@ def get_dominant_phase_per_cluster(cluster_ids, labels):
     labels = np.asarray(labels)
 
     unique_clusters, inverse = np.unique(cluster_ids, return_inverse=True)
-    phase_counts = np.zeros((len(unique_clusters), 4),dtype=np.int32)
+    phase_counts = np.zeros((len(unique_clusters), 6),dtype=np.int32)
     np.add.at(phase_counts,(inverse, labels),1)
     dominant_phase_indices = np.argmax(phase_counts,axis=1)
-    phase_names = np.array(["liquid","ice_ih","ice_ic","interfacial"])
+    phase_names = np.array(["liquid","ice_ih", "ice_ic","interfacial","hydrate","interfacial_hydrate"])
     dominant_phases = phase_names[dominant_phase_indices]
     cluster_phases = dict(zip(unique_clusters, dominant_phases))
     return cluster_phases
