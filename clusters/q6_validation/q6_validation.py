@@ -34,11 +34,11 @@ largest_cluster_q6_freud = []
 largest_cluster_q6_pyscal = []'''
 
 final_results = {
-    "labels": None,
+    "phase": None,
     "Cutoff": {"q4": None, "q6": None},
-    "Cutoff Averaged": {"q4": None, "q6": None,},
-    "Voronoi": {"q4": None,"q6": None,},
-    "Voronoi Averaged": {"q4": None,"q6": None,}
+    "Cutoff Averaged": {"q4": None, "q6": None},
+    "Voronoi": {"q4": None,"q6": None},
+    "Voronoi Averaged": {"q4": None,"q6": None}
 }
 
 
@@ -124,12 +124,12 @@ with open(config.dump, 'r') as f:
             #CUTOFF
             freud_cutoff = steinhardt_cutoff(box,positions) # calculate all q6s
             cluster_freud_cutoff = average_q6_per_cluster(freud_cutoff,cluster_ids) # make a dictionary for each clusters size and q6
-            cutoff_cluster_q6 = [c["avg_q6"]for c in cluster_freud_cutoff.values()] # extract averages (clusters q6)
+            cutoff_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_cutoff.items()} # extract averages (clusters q6)
 
             #doing the same for q4s
             freud_cutoff_q4 = steinhardt_cutoff(box, positions, l=4)
             cluster_freud_cutoff_q4 = average_q4_per_cluster(freud_cutoff_q4,cluster_ids)
-            cutoff_cluster_q4 = [c["avg_q4"]for c in cluster_freud_cutoff_q4.values()]
+            cutoff_cluster_q4 = {cluster_id: c["avg_q4"]for cluster_id, c in cluster_freud_cutoff_q4.items()}
 
             '''pyscal_cutoff = pyscal_steinhardt(positions, box) # calculate all q6s with pyscal
             cluster_pyscal_cutoff = average_q6_per_cluster(pyscal_cutoff,cluster_ids) # make the dictionary
@@ -140,11 +140,11 @@ with open(config.dump, 'r') as f:
             # CUTOFF AVERAGED
             freud_cutoff_avg = steinhardt_cutoff(box,positions,average=True)
             cluster_freud_cutoff_avg = average_q6_per_cluster(freud_cutoff_avg,cluster_ids)
-            cutoff_avg_cluster_q6 = [c["avg_q6"]for c in cluster_freud_cutoff_avg.values()]
+            cutoff_avg_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_cutoff_avg.items()}
 
             freud_cutoff_avg_q4 = steinhardt_cutoff(box, positions, l=4, average=True)
             cluster_freud_cutoff_avg_q4 = average_q4_per_cluster(freud_cutoff_avg_q4,cluster_ids)
-            cutoff_cluster_avg_q4 = [c["avg_q4"]for c in cluster_freud_cutoff_avg_q4.values()]
+            cutoff_cluster_avg_q4 = {cluster_id: c["avg_q4"]for cluster_id, c in cluster_freud_cutoff_avg_q4.items()}
 
             '''pyscal_cutoff_avg = pyscal_steinhardt(positions, box, averaged=True)
             cluster_pyscal_cutoff_avg = average_q6_per_cluster(pyscal_cutoff_avg,cluster_ids)
@@ -160,11 +160,11 @@ with open(config.dump, 'r') as f:
             #VORONOI
             freud_voronoi = steinhardt_voronoi(box,positions)
             cluster_freud_voronoi = average_q6_per_cluster(freud_voronoi,cluster_ids)
-            voronoi_cluster_q6 = [c["avg_q6"]for c in cluster_freud_voronoi.values()]
+            voronoi_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_voronoi.items()}
 
             freud_voronoi_q4 = steinhardt_voronoi(box, positions,l=4)
             cluster_freud_voronoi_q4 = average_q4_per_cluster(freud_voronoi_q4,cluster_ids)
-            voronoi_cluster_q4 = [c["avg_q4"]for c in cluster_freud_voronoi_q4.values()]
+            voronoi_cluster_q4 = {cluster_id: c["avg_q4"]for cluster_id, c in cluster_freud_voronoi_q4.items()}
 
             '''pyscal_voronoi = pyscal_steinhardt(positions, box, method='voronoi')
             cluster_pyscal_voronoi  = average_q6_per_cluster(pyscal_voronoi,cluster_ids)
@@ -174,11 +174,11 @@ with open(config.dump, 'r') as f:
             # VORONOI AVERAGED
             freud_voronoi_avg = steinhardt_voronoi(box,positions,average=True)
             cluster_freud_voronoi_avg = average_q6_per_cluster(freud_voronoi_avg,cluster_ids)
-            voronoi_avg_cluster_q6 = [c["avg_q6"]for c in cluster_freud_voronoi_avg.values()]
+            voronoi_avg_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_voronoi_avg.items()}
 
             freud_voronoi_avg_q4 = steinhardt_voronoi(box, positions,average=True, l=4)
             cluster_freud_voronoi_avg_q4 = average_q4_per_cluster(freud_voronoi_avg_q4,cluster_ids)
-            voronoi_cluster_avg_q4 = [c["avg_q4"]for c in cluster_freud_voronoi_avg_q4.values()]
+            voronoi_cluster_avg_q4 = {cluster_id: c["avg_q4"]for cluster_id, c in cluster_freud_voronoi_avg_q4.items()}
             
             '''pyscal_voronoi_avg = pyscal_steinhardt(positions, box, method='voronoi', averaged=True)
             cluster_pyscal_voronoi_avg  = average_q6_per_cluster(pyscal_voronoi_avg,cluster_ids)
@@ -200,6 +200,9 @@ with open(config.dump, 'r') as f:
             voronoi_avg_avgs.append(sum(voronoi_avg_cluster_q6)/len(voronoi_avg_cluster_q6))'''
 
 
+            cluster_phases = get_dominant_phase_per_cluster(cluster_ids,labels)
+            final_results["phase"] = cluster_phases
+
             final_results["Cutoff"]["q4"] = cutoff_cluster_q4
             final_results["Cutoff"]["q6"] = cutoff_cluster_q6
 
@@ -212,7 +215,6 @@ with open(config.dump, 'r') as f:
             final_results["Voronoi Averaged"]["q4"] = voronoi_cluster_avg_q4
             final_results["Voronoi Averaged"]["q6"] = voronoi_avg_cluster_q6
 
-            final_results['labels'] = labels
 
 
 

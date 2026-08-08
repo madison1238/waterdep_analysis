@@ -111,16 +111,47 @@ def plot_maxs(timesteps, lammps, cutoff,cutoff_avg, voronoi, voronoi_avg):
 
 
 def plot_final_q6_vs_q4(final_results):
+    phase_colors = {
+        "liquid": "blue",
+        "ice_ih": "red",
+        "ice_ic": "green",
+        "interfacial": "gold",
+        "hydrate": "purple",
+        "interfacial_hydrate": "brown"
+    }
+
+    phase_names = {
+        "liquid": "Liquid",
+        "ice_ih": "Ice Ih",
+        "ice_ic": "Ice Ic",
+        "interfacial": "Interfacial Ice",
+        "hydrate": "Hydrate",
+        "interfacial_hydrate": "Interfacial Hydrate"
+    }
+
     fig, axs = plt.subplots(2, 2,figsize=(12, 10),sharex=True,sharey=True)
     methods = ["Cutoff","Cutoff Averaged","Voronoi","Voronoi Averaged"]
-    axs = axs.flatten()
     for ax, method in zip(axs, methods):
         q4 = final_results[method]["q4"]
         q6 = final_results[method]["q6"]
-        ax.scatter(q6,q4,s=4,alpha=0.2,color="blue")
+
+        for phase in phase_colors:
+            q4_values = []
+            q6_values = []
+
+            for cluster_id in q4:
+                if final_results[phase][cluster_id]== phase:
+
+                    q4_values.append(q4[cluster_id])
+                    q6_values.append(q6[cluster_id])
+            if q4_values:
+                ax.scatter(q6_values,q4_values,s=4,alpha=0.3,color=phase_colors[phase],label=phase_names[phase])
         ax.set_title(method)
-    fig.supxlabel("q6")
-    fig.supylabel("$q4")
-    plt.tight_layout()
-    plt.savefig(f"{config.output}/q4_vs_q6.png",)
+
+    fig.supxlabel("q6", y=0.06)
+    fig.supylabel("q4")
+    handles, legend_labels = axs[0].get_legend_handles_labels()
+    fig.legend(handles,legend_labels,loc="lower center",bbox_to_anchor=(0.5, 0.01),ncol=3,fontsize=11,markerscale=3)
+    plt.tight_layout(rect=[0.05, 0.12, 1, 1])
+    plt.savefig(f"{config.output}/q4_vs_q6.png",bbox_inches="tight")
     plt.close()
