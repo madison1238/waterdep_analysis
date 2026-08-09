@@ -1,5 +1,30 @@
 from ovito.modifiers import ChillPlusModifier
 import config
+import numpy as np
+from freud_methods import *
+from pyscal_methods import *
+
+
+def track_particle_order(positions, box, ids, target_id, cutoff=3.5):
+    if target_id not in ids:
+        raise ValueError(f"Particle ID {target_id} not found in frame.")
+    
+    target_index = np.where(ids == target_id)[0][0]
+
+    q4_freud = steinhardt_cutoff(box,positions,cutoff=cutoff,average=True,l=4)
+    q6_freud = steinhardt_cutoff(box,positions,cutoff=cutoff,average=True,l=6)
+    q4_pyscal = pyscal_steinhardt(positions,box,method='cutoff',averaged=True,cutoff=cutoff,param=4)
+    q6_pyscal = pyscal_steinhardt(positions,box,method='cutoff',averaged=True,cutoff=cutoff,param=6)
+    
+
+    return {
+        "q4_freud": q4_freud[target_index],
+        "q6_freud": q6_freud[target_index],
+        "q4_pyscal": q4_pyscal[target_index],
+        "q6_pyscal": q6_pyscal[target_index],
+        "index": target_index
+    }
+
 
 def group_q6_by_phase(q6_values, labels):
     phases = {
