@@ -30,7 +30,6 @@ with open(config.dump, 'r') as f:
             break
         if line.strip() == "ITEM: TIMESTEP":
             timestep = int(f.readline().strip())
-            print(f"Working on final timestep: {timestep}")
             #timesteps.append(timestep)
         
             f.readline()
