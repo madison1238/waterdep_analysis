@@ -10,36 +10,11 @@ import os
 
 
 
-#timesteps = []
 
-'''lammps_q6_timestep = []
 
-lammps_q6_maxs = []
-lammps_q6_avgs = []
 
-cutoff_maxs = []
-cutoff_avgs = []
 
-cutoff_avg_maxs = []
-cutoff_avg_avgs = []
 
-voronoi_maxs = []
-voronoi_avgs = []
-
-voronoi_avg_avgs = []
-voronoi_avg_maxs = []
-
-largest_cluster_size = []
-largest_cluster_q6_freud = []
-largest_cluster_q6_pyscal = []'''
-
-final_results = {
-    "phase": None,
-    "Cutoff": {"q4": None, "q6": None},
-    "Cutoff Averaged": {"q4": None, "q6": None},
-    "Voronoi": {"q4": None,"q6": None},
-    "Voronoi Averaged": {"q4": None,"q6": None}
-}
 
 
 frame = 0
@@ -62,17 +37,7 @@ with open(config.dump, 'r') as f:
     #for cid in top4_ids:
         #top4_atoms[cid] = final_cluster_members[cid]
 
-    '''cluster_history_4 = {
-    cid: {
-        "time": [],
-        "size": [],
-        "lammps": [],
-        "cutoff": [],
-        "cutoff_avg": [],
-        "voronoi": [],
-        "voronoi_avg": [],
-        "phase": []
-    }for cid in top4_ids}'''
+  
 
 
     while True:
@@ -112,12 +77,7 @@ with open(config.dump, 'r') as f:
                 #lammps_q6_timestep.append(q6)
 
 
-            '''current_cluster_members = {}
 
-            for atom_id, cid in zip(atom_ids, cluster_ids):
-                if cid not in current_cluster_members:
-                    current_cluster_members[cid] = set()
-                current_cluster_members[cid].add(atom_id)'''
             
             ids, positions, box, labels = load_frame(config.dump, final_frame, True)
 
@@ -212,23 +172,6 @@ with open(config.dump, 'r') as f:
             voronoi_avg_avgs.append(sum(voronoi_avg_cluster_q6)/len(voronoi_avg_cluster_q6))'''
 
 
-            cluster_phases = get_dominant_phase_per_cluster(cluster_ids,labels)
-            final_results["phase"] = cluster_phases
-
-            final_results["Cutoff"]["q4"] = cutoff_cluster_q4
-            final_results["Cutoff"]["q6"] = cutoff_cluster_q6
-
-            final_results["Cutoff Averaged"]["q4"] = cutoff_cluster_avg_q4
-            final_results["Cutoff Averaged"]["q6"] = cutoff_avg_cluster_q6
-
-            final_results["Voronoi"]["q4"] = voronoi_cluster_q4
-            final_results["Voronoi"]["q6"] = voronoi_cluster_q6
-
-            final_results["Voronoi Averaged"]["q4"] = voronoi_cluster_avg_q4
-            final_results["Voronoi Averaged"]["q6"] = voronoi_avg_cluster_q6
-
-
-
 
             frame += 1
 
@@ -271,44 +214,10 @@ with open(config.dump, 'r') as f:
                 out.write(f"Max: {max(pyscal_vornoi_avg_cluster_q6)}\n")
                 out.write(f"Avg: {sum(pyscal_vornoi_avg_cluster_q6) / len(pyscal_vornoi_avg_cluster_q6)}\n\n")'''
 
-            '''for original_cid in top4_ids:
-                target_atoms = top4_atoms[original_cid]
-                valid_cluster_members = {cid: members for cid, members in current_cluster_members.items() if cid in cluster_lammps}
-                matched_cid, overlap = find_matching_cluster(target_atoms,valid_cluster_members)
-
-                if matched_cid is None:
-                    continue
-
-                mask = np.array(cluster_ids) == matched_cid
-                cluster_labels = labels[mask]
-
-                liquid = np.sum(cluster_labels == 0)
-                ih = np.sum(cluster_labels == 1)
-                ic = np.sum(cluster_labels == 2)
-                interface = np.sum(cluster_labels == 3)
-
-                counts = {
-                    "Liquid": liquid,
-                    "Ice Ih": ih,
-                    "Ice Ic": ic,
-                    "Interfacial": interface
-                }
-
-                dominant_phase = max(counts, key=counts.get)
-
-
-                cluster_history_4[original_cid]["time"].append(timestep)
-                cluster_history_4[original_cid]["size"].append(cluster_lammps[matched_cid]["size"])
-
-                cluster_history_4[original_cid]["lammps"].append(cluster_lammps[matched_cid]["avg_q6"])
-                cluster_history_4[original_cid]["cutoff"].append(cluster_freud_cutoff[matched_cid]["avg_q6"])
-                cluster_history_4[original_cid]["cutoff_avg"].append(cluster_freud_cutoff_avg[matched_cid]["avg_q6"])
-                cluster_history_4[original_cid]["voronoi"].append(cluster_freud_voronoi[matched_cid]["avg_q6"])
-                cluster_history_4[original_cid]["voronoi_avg"].append(cluster_freud_voronoi_avg[matched_cid]["avg_q6"])
-                cluster_history_4[original_cid]["phase"].append(dominant_phase)'''
+           
 
 #plot_avgs(timesteps,lammps_q6_avgs, cutoff_avgs, cutoff_avg_avgs, voronoi_avgs, voronoi_avg_avgs)
 #plot_maxs(timesteps,lammps_q6_maxs, cutoff_maxs, cutoff_avg_maxs, voronoi_maxs, voronoi_avg_maxs)
 #plot_cluster_q6_history(cluster_history_4)
 #plot_q6_largest_cluster_freud_pyscal(largest_cluster_size, largest_cluster_q6_freud, largest_cluster_q6_pyscal)
-plot_final_q6_vs_q4_color(final_results)
+#plot_final_q6_vs_q4_color(final_results)
