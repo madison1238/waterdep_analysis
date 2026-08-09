@@ -64,6 +64,7 @@ def plot_q6_largest_cluster_freud_pyscal(size, freud_q6, pyscal_q6):
     ax[0].set_ylabel("Q6")
     ax[0].grid(alpha=0.3)
 
+    ax[1].scatter(size, pyscal_q6, s=20)
     ax[1].set_title("Pyscal")
     ax[1].set_xlabel("Largest Cluster Size")
     ax[1].grid(alpha=0.3)
