@@ -311,4 +311,4 @@ with open(config.dump, 'r') as f:
 #plot_maxs(timesteps,lammps_q6_maxs, cutoff_maxs, cutoff_avg_maxs, voronoi_maxs, voronoi_avg_maxs)
 #plot_cluster_q6_history(cluster_history_4)
 #plot_q6_largest_cluster_freud_pyscal(largest_cluster_size, largest_cluster_q6_freud, largest_cluster_q6_pyscal)
-plot_final_q6_vs_q4_simple(final_results)
+plot_final_q6_vs_q4_color(final_results)

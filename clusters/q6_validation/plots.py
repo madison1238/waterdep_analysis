@@ -155,6 +155,7 @@ def plot_final_q6_vs_q4_color(final_results):
 
     fig, axs = plt.subplots(2, 2,figsize=(12, 10),sharex=True,sharey=True)
     methods = ["Cutoff","Cutoff Averaged","Voronoi","Voronoi Averaged"]
+    axs = axs.flatten()
     for ax, method in zip(axs, methods):
         q4 = final_results[method]["q4"]
         q6 = final_results[method]["q6"]
