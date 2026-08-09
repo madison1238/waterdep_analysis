@@ -9,7 +9,7 @@ import os
 
 timesteps = []
 
-lammps_q6_timestep = []
+'''lammps_q6_timestep = []
 
 lammps_q6_maxs = []
 lammps_q6_avgs = []
@@ -28,17 +28,17 @@ voronoi_labels = []
 
 voronoi_avg_avgs = []
 voronoi_avg_maxs = []
-voronoi_avg_labels = []
+voronoi_avg_labels = []'''
 
 
 
-final_results = {
+'''final_results = {
     "labels": None,
     "Cutoff": {"q4": None, "q6": None},
     "Cutoff Averaged": {"q4": None, "q6": None,},
     "Voronoi": {"q4": None,"q6": None,},
     "Voronoi Averaged": {"q4": None,"q6": None,}
-}
+}'''
 
 
 
@@ -79,7 +79,7 @@ with open(config.dump, 'r') as f:
                 lammps_q6_timestep.append(q6)
             
             ids, positions, box, labels = load_frame(config.dump, frame, True)
-            #print(labels)
+
 
             freud_cutoff = steinhardt_cutoff(box,positions)
             freud_cutoff_q4 = steinhardt_cutoff(box, positions, l=4)
@@ -101,7 +101,7 @@ with open(config.dump, 'r') as f:
             avg_pyscal_voronoi = pyscal_steinhardt(positions,box, method='voronoi', averaged=True)
             voronoi_avg_labels = group_q6_by_phase(freud_voronoi_avg,labels)
 
-            lammps_q6_maxs.append(max(lammps_q6_timestep))
+            '''lammps_q6_maxs.append(max(lammps_q6_timestep))
             lammps_q6_avgs.append(sum(lammps_q6_timestep)/len(lammps_q6_timestep))
 
             cutoff_maxs.append(max(freud_cutoff))
@@ -114,14 +114,14 @@ with open(config.dump, 'r') as f:
             voronoi_avgs.append(sum(freud_voronoi)/len(freud_voronoi))
 
             voronoi_avg_maxs.append(max(freud_voronoi_avg))
-            voronoi_avg_avgs.append(sum(freud_voronoi_avg)/len(freud_voronoi_avg))
+            voronoi_avg_avgs.append(sum(freud_voronoi_avg)/len(freud_voronoi_avg))'''
 
 
 
             frame += 1
 
 
-            final_results["Cutoff"]["q4"] = freud_cutoff_q4
+            '''final_results["Cutoff"]["q4"] = freud_cutoff_q4
             final_results["Cutoff"]["q6"] = freud_cutoff
 
             final_results["Cutoff Averaged"]["q4"] = freud_cutoff_avg_q4
@@ -131,14 +131,14 @@ with open(config.dump, 'r') as f:
             final_results["Voronoi"]["q6"] = freud_voronoi
 
             final_results["Voronoi Averaged"]["q4"] = freud_voronoi_avg_q4
-            final_results["Voronoi Averaged"]["q6"] = freud_voronoi_avg
+            final_results["Voronoi Averaged"]["q6"] = freud_voronoi_avg'''
 
             final_results['labels'] = labels
 
             with open(config.txt_file, 'a') as out:
                 out.write(f"Timestep: {timestep}\n\n")
 
-                out.write(f"LAMMPS\n")
+                '''out.write(f"LAMMPS\n")
                 out.write(f"Max: {lammps_q6_maxs[-1]}\n")
                 out.write(f"Avg: {lammps_q6_avgs[-1]}\n\n")
 
@@ -172,17 +172,17 @@ with open(config.dump, 'r') as f:
 
                 out.write(f"PYSCAL VORONOI AVERAGED\n")
                 out.write(f"Max: {max(avg_pyscal_voronoi)}\n")
-                out.write(f"Avg: {sum(avg_pyscal_voronoi) / len(avg_pyscal_voronoi)}\n\n")
+                out.write(f"Avg: {sum(avg_pyscal_voronoi) / len(avg_pyscal_voronoi)}\n\n")'''
 
 
             
 
 
-plot_avgs(timesteps,lammps_q6_avgs, cutoff_avgs, cutoff_avg_avgs, voronoi_avgs, voronoi_avg_avgs)
-plot_maxs(timesteps,lammps_q6_maxs, cutoff_maxs, cutoff_avg_maxs, voronoi_maxs, voronoi_avg_maxs)
-plot_phase_summary([cutoff_labels,cutoff_avg_labels,voronoi_labels,voronoi_avg_labels],
+#plot_avgs(timesteps,lammps_q6_avgs, cutoff_avgs, cutoff_avg_avgs, voronoi_avgs, voronoi_avg_avgs)
+#plot_maxs(timesteps,lammps_q6_maxs, cutoff_maxs, cutoff_avg_maxs, voronoi_maxs, voronoi_avg_maxs)
+'''plot_phase_summary([cutoff_labels,cutoff_avg_labels,voronoi_labels,voronoi_avg_labels],
     ["Freud Cutoff","Freud Cutoff Averaged","Freud Voronoi","Freud Voronoi Averaged"],
     f"{config.output}/phase_summary.png",
     f"{config.output}/phase_summary.txt"
-)
-plot_final_q6_vs_q4(final_results)
+)'''
+#plot_final_q6_vs_q4(final_results)
