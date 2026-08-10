@@ -6,82 +6,71 @@ from ovito.modifiers import ChillPlusModifier
 from plots import *
 import config
 import os
-
-timesteps = []
-
-'''lammps_q6_timestep = []
-
-lammps_q6_maxs = []
-lammps_q6_avgs = []
-
-cutoff_maxs = []
-cutoff_avgs = []
-cutoff_labels = []
-
-cutoff_avg_maxs = []
-cutoff_avg_avgs = []
-cutoff_avg_labels = []
-
-voronoi_maxs = []
-voronoi_avgs = []
-voronoi_labels = []
-
-voronoi_avg_avgs = []
-voronoi_avg_maxs = []
-voronoi_avg_labels = []'''
-
-
-
-'''final_results = {
-    "labels": None,
-    "Cutoff": {"q4": None, "q6": None},
-    "Cutoff Averaged": {"q4": None, "q6": None,},
-    "Voronoi": {"q4": None,"q6": None,},
-    "Voronoi Averaged": {"q4": None,"q6": None,}
-}'''
-
+import csv
 
 
 frame = 0
-
+target_id = 4093
 os.makedirs(config.output, exist_ok=True)
 
+output_file = f"{config.output}/single_particle_q4_q6.csv"
+with open(output_file, "w", newline="") as csvfile:
+    writer = csv.writer(csvfile)
+    writer.writerow([
+        "timestep",
+        "particle_id",
+        "phase",
+        "q4_freud",
+        "q6_freud",
+        "q4_pyscal",
+        "q6_pyscal"
+    ])
 
 
-with open(config.txt_file, 'w') as out:
-    out.write("Q6 SUMMARY\n")
-    out.write(f"{'=' * 20}\n\n")
+    with open(config.dump, 'r') as f:
+        while True:
+            line = f.readline()
 
-with open(config.dump, 'r') as f:
-    while True:
-        line = f.readline()
-
-        if not line:
-            break
-        if line.strip() == "ITEM: TIMESTEP":
-            timestep = int(f.readline().strip())
-            timesteps.append(timestep)
-        
-            f.readline()
-            num_atoms = int(float(f.readline().strip()))
-
-            f.readline()
-            f.readline()
-            f.readline()
-            f.readline()
-            f.readline()
-
-            lammps_q6_timestep = []
-
-            for i in range(num_atoms):
-                line = f.readline()
-                q6 = float(line.split()[5])
-                lammps_q6_timestep.append(q6)
+            if not line:
+                break
+            if line.strip() == "ITEM: TIMESTEP":
+                timestep = int(f.readline().strip())
             
-            ids, positions, box, labels = load_frame(config.dump, frame, True)
+                f.readline()
+                num_atoms = int(float(f.readline().strip()))
+
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
 
 
-            freud_cutoff = steinhardt_cutoff(box,positions)
+                for i in range(num_atoms):
+                    line = f.readline()
+
+                    
+                
+                ids, positions, box, labels = load_frame(config.dump, frame, True)
+
+                particle_values = track_particle_order(positions, box, ids, target_id)
+                particle_phase = labels[particle_values["index"]]
+
+
+                writer.writerow([
+                    timestep,
+                    target_id,
+                    particle_phase,
+                    particle_values["q4_freud"],
+                    particle_values["q6_freud"],
+                    particle_values["q4_pyscal"],
+                    particle_values["q6_pyscal"]
+                ])
+
+                frame += 1
+
+
+            '''freud_cutoff = steinhardt_cutoff(box,positions)
             freud_cutoff_q4 = steinhardt_cutoff(box, positions, l=4)
             pyscal_cutoff = pyscal_steinhardt(positions,box)
             cutoff_labels = group_q6_by_phase(freud_cutoff,labels )
@@ -99,7 +88,7 @@ with open(config.dump, 'r') as f:
             freud_voronoi_avg = steinhardt_voronoi(box,positions,average=True)
             freud_voronoi_avg_q4 = steinhardt_voronoi(box, positions, average=True, l=4)
             avg_pyscal_voronoi = pyscal_steinhardt(positions,box, method='voronoi', averaged=True)
-            voronoi_avg_labels = group_q6_by_phase(freud_voronoi_avg,labels)
+            voronoi_avg_labels = group_q6_by_phase(freud_voronoi_avg,labels)'''
 
             '''lammps_q6_maxs.append(max(lammps_q6_timestep))
             lammps_q6_avgs.append(sum(lammps_q6_timestep)/len(lammps_q6_timestep))
@@ -117,10 +106,6 @@ with open(config.dump, 'r') as f:
             voronoi_avg_avgs.append(sum(freud_voronoi_avg)/len(freud_voronoi_avg))'''
 
 
-
-            frame += 1
-
-
             '''final_results["Cutoff"]["q4"] = freud_cutoff_q4
             final_results["Cutoff"]["q6"] = freud_cutoff
 
@@ -131,14 +116,14 @@ with open(config.dump, 'r') as f:
             final_results["Voronoi"]["q6"] = freud_voronoi
 
             final_results["Voronoi Averaged"]["q4"] = freud_voronoi_avg_q4
-            final_results["Voronoi Averaged"]["q6"] = freud_voronoi_avg'''
+            final_results["Voronoi Averaged"]["q6"] = freud_voronoi_avg
 
-            final_results['labels'] = labels
+            final_results['labels'] = labels'''
 
-            with open(config.txt_file, 'a') as out:
+            '''with open(config.txt_file, 'a') as out:
                 out.write(f"Timestep: {timestep}\n\n")
 
-                '''out.write(f"LAMMPS\n")
+                out.write(f"LAMMPS\n")
                 out.write(f"Max: {lammps_q6_maxs[-1]}\n")
                 out.write(f"Avg: {lammps_q6_avgs[-1]}\n\n")
 
