@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import config
 import numpy as np
+import csv
 from ovito.modifiers import ChillPlusModifier
 
 
@@ -154,3 +155,42 @@ def plot_final_q6_vs_q4(final_results):
     plt.savefig(f"{config.output}/q4_vs_q6.png",  bbox_inches="tight")
     plt.close()
 
+def plot_particle_q4_q6(csv_file, output_file):
+    nanoseconds = []
+    timesteps = []
+    q4_freud = []
+    q4_pyscal = []
+    q6_freud = []
+    q6_pyscal = []
+
+    with open(csv_file, "r") as file:
+
+        reader = csv.DictReader(file)
+
+        for row in reader:
+            timesteps.append(float(row["timestep"]))
+
+            q4_freud.append(float(row["q4_freud"]))
+            q4_pyscal.append(float(row["q4_pyscal"]))
+
+            q6_freud.append(float(row["q6_freud"]))
+            q6_pyscal.append(float(row["q6_pyscal"]))
+    nanoseconds = [t for (t * 5)/1e6 in timesteps ]
+    fig, axes = plt.subplots(1,2,figsize=(12, 5))
+    axes[0].plot(nanoseconds,q6_freud,label="Freud",color="blue",linewidth=2)
+    axes[0].plot(nanoseconds,q6_pyscal,label="Pyscal",color="orange",linewidth=2)
+    axes[0].set_xlabel("Nanoseconds")
+    axes[0].set_ylabel("q6")
+    axes[0].set_title("q6 vs Time (ns)")
+    axes[0].legend()
+
+    axes[1].plot(nanoseconds,q4_freud,label="Freud",color="blue",linewidth=2)
+    axes[1].plot(nanoseconds,q4_pyscal,label="Pyscal",color="orange",linewidth=2)
+    axes[1].set_xlabel("Nanoseconds")
+    axes[1].set_ylabel("q4")
+    axes[1].set_title("q4 vs. Time (ns)")
+    axes[1].legend()
+
+    plt.tight_layout()
+    plt.savefig(output_file,dpi=300,bbox_inches="tight")
+    plt.close()
