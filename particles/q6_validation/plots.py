@@ -156,7 +156,6 @@ def plot_final_q6_vs_q4(final_results):
     plt.close()
 
 def plot_particle_q4_q6(csv_file, output_file):
-    nanoseconds = []
     timesteps = []
     q4_freud = []
     q4_pyscal = []
@@ -175,7 +174,7 @@ def plot_particle_q4_q6(csv_file, output_file):
 
             q6_freud.append(float(row["q6_freud"]))
             q6_pyscal.append(float(row["q6_pyscal"]))
-    nanoseconds = [t for (t * 5)/1e6 in timesteps ]
+    nanoseconds = [(t * 5) / 1e6 for t in timesteps]
     fig, axes = plt.subplots(1,2,figsize=(12, 5))
     axes[0].plot(nanoseconds,q6_freud,label="Freud",color="blue",linewidth=2)
     axes[0].plot(nanoseconds,q6_pyscal,label="Pyscal",color="orange",linewidth=2)
