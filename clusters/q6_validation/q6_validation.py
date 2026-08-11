@@ -26,7 +26,7 @@ for rank, (cluster_id, cluster_size) in enumerate(final_clusters,start=1):
     print(f"Cluster size: {cluster_size}")
     print("=" * 60)
     final_cluster_particles = clusters_at_final[cluster_id]
-    output_csv = (f"cluster_q6_tracking_rank{rank}_cluster{cluster_id}.csv")
+    output_csv = (f"{config.output}/cluster_q6_tracking_rank{rank}_cluster{cluster_id}.csv")
 
     track_cluster_q6(
         filename=config.dump,
