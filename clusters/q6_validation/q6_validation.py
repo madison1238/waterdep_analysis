@@ -9,10 +9,18 @@ import os
 
 
 
-frame = 0
+final_timestep,final_frame = find_last_timestep(config.dump)
+print(final_timestep)
+final_clusters = find_largest_clusters(config.dump,final_timestep)
+largest_id = list(final_clusters.keys())[0]
+print(largest_id)
+tracked_particles = final_clusters[largest_id]["particle_ids"]
+print(tracked_particles)
 
 
 
+
+'''frame = 0
 
 os.makedirs(config.output, exist_ok=True)
 
@@ -20,8 +28,6 @@ with open(config.txt_file, 'w') as out:
     out.write("Q6 SUMMARY\n")
     out.write(f"{'=' * 20}\n\n")
 
-final_timestep,final_frame = find_last_timestep(config.dump)
-four_largest = find_largest_clusters(config.dump, final_timestep)
 
 
 with open(config.dump, 'r') as f:
@@ -66,7 +72,7 @@ with open(config.dump, 'r') as f:
 
 
             #CUTOFF
-            '''print("working on q6 with freud cutoff...")
+            print("working on q6 with freud cutoff...")
             freud_cutoff = steinhardt_cutoff(box,positions) # calculate all q6s
             cluster_freud_cutoff = average_q6_per_cluster(freud_cutoff,cluster_ids) # make a dictionary for each clusters size and q6
             cutoff_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_cutoff.items()} # extract averages (clusters q6)
@@ -79,7 +85,7 @@ with open(config.dump, 'r') as f:
 
             pyscal_cutoff = pyscal_steinhardt(positions, box) # calculate all q6s with pyscal
             cluster_pyscal_cutoff = average_q6_per_cluster(pyscal_cutoff,cluster_ids) # make the dictionary
-            pyscal_cutoff_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_cutoff.values()] # extract q6s'''
+            pyscal_cutoff_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_cutoff.values()] # extract q6s
 
 
 
@@ -89,10 +95,10 @@ with open(config.dump, 'r') as f:
             cluster_freud_cutoff_avg = average_q6_per_cluster(freud_cutoff_avg,cluster_ids)
             #cutoff_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_cutoff_avg.items()}
 
-            '''print("working on q4 with freud cutoff averaged...")
+            print("working on q4 with freud cutoff averaged...")
             freud_cutoff_avg_q4 = steinhardt_cutoff(box, positions, l=4, average=True)
             cluster_freud_cutoff_avg_q4 = average_q4_per_cluster(freud_cutoff_avg_q4,cluster_ids)
-            cutoff_cluster_avg_q4 = {cluster_id: c["avg_q4"]for cluster_id, c in cluster_freud_cutoff_avg_q4.items()}'''
+            cutoff_cluster_avg_q4 = {cluster_id: c["avg_q4"]for cluster_id, c in cluster_freud_cutoff_avg_q4.items()}
 
             print(f"working on q6 with pyscal cutoff averaged for timestep {timestep}")
             pyscal_cutoff_avg = pyscal_steinhardt(positions, box, averaged=True)
@@ -109,7 +115,7 @@ with open(config.dump, 'r') as f:
 
 
             #VORONOI
-            '''print("working on q6 with freud voronoi...")
+            print("working on q6 with freud voronoi...")
             freud_voronoi = steinhardt_voronoi(box,positions)
             cluster_freud_voronoi = average_q6_per_cluster(freud_voronoi,cluster_ids)
             voronoi_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_voronoi.items()}
@@ -121,11 +127,11 @@ with open(config.dump, 'r') as f:
 
             pyscal_voronoi = pyscal_steinhardt(positions, box, method='voronoi')
             cluster_pyscal_voronoi  = average_q6_per_cluster(pyscal_voronoi,cluster_ids)
-            pyscal_vornoi_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi.values()]'''
+            pyscal_vornoi_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi.values()]
 
 
             # VORONOI AVERAGED
-            '''print("working on q6 with freud voronoi averaged...")
+            print("working on q6 with freud voronoi averaged...")
             freud_voronoi_avg = steinhardt_voronoi(box,positions,average=True)
             cluster_freud_voronoi_avg = average_q6_per_cluster(freud_voronoi_avg,cluster_ids)
             voronoi_avg_cluster_q6 = {cluster_id: c["avg_q6"]for cluster_id, c in cluster_freud_voronoi_avg.items()}
@@ -137,7 +143,7 @@ with open(config.dump, 'r') as f:
             
             pyscal_voronoi_avg = pyscal_steinhardt(positions, box, method='voronoi', averaged=True)
             cluster_pyscal_voronoi_avg  = average_q6_per_cluster(pyscal_voronoi_avg,cluster_ids)
-            pyscal_vornoi_avg_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi_avg.values()]'''
+            pyscal_vornoi_avg_cluster_q6 = [c["avg_q6"]for c in cluster_pyscal_voronoi_avg.values()]
 
 
             frame += 1
@@ -145,7 +151,7 @@ with open(config.dump, 'r') as f:
             with open(config.txt_file, 'a') as out:
                 out.write(f"Timestep: {timestep}\n\n")
 
-                '''out.write(f"LAMMPS\n")
+                out.write(f"LAMMPS\n")
                 out.write(f"Max: {lammps_q6_maxs[-1]}\n")
                 out.write(f"Avg: {lammps_q6_avgs[-1]}\n\n")
 
@@ -179,7 +185,7 @@ with open(config.dump, 'r') as f:
 
                 out.write(f"PYSCAL VORONOI AVERAGED\n")
                 out.write(f"Max: {max(pyscal_vornoi_avg_cluster_q6)}\n")
-                out.write(f"Avg: {sum(pyscal_vornoi_avg_cluster_q6) / len(pyscal_vornoi_avg_cluster_q6)}\n\n")'''
+                out.write(f"Avg: {sum(pyscal_vornoi_avg_cluster_q6) / len(pyscal_vornoi_avg_cluster_q6)}\n\n")
 
            
 
@@ -188,4 +194,4 @@ with open(config.dump, 'r') as f:
 #plot_cluster_q6_history(cluster_history_4)
 #plot_q6_largest_cluster_freud_pyscal(largest_cluster_size, largest_cluster_q6_freud, largest_cluster_q6_pyscal)
 #plot_final_q6_vs_q4_color(final_results)
-plot_q6_largest_cluster_freud_pyscal(largest_cluster_size,largest_q6_freud,largest_q6_pyscal)
+plot_q6_largest_cluster_freud_pyscal(largest_cluster_size,largest_q6_freud,largest_q6_pyscal)'''
