@@ -1,6 +1,8 @@
 import numpy as np
 from collections import defaultdict
 from pyscal_methods import *
+from ovito_utils import * 
+import csv
 
 def find_last_timestep(filename):
     final_frame = -1
@@ -148,3 +150,67 @@ def get_dominant_phase_per_cluster(cluster_ids, labels):
     dominant_phases = phase_names[dominant_phase_indices]
     cluster_phases = dict(zip(unique_clusters, dominant_phases))
     return cluster_phases
+
+
+
+def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id, 
+                     final_cluster_particles, final_cluster_size, 
+                     interval, output_csv):
+    fieldnames = [
+        "final_cluster_rank",
+        "final_cluster_id",
+        "final_cluster_size",
+        "timestep",
+        "time_ns",
+        "cluster_id",
+        "cluster_size",
+        "overlap",
+        "overlap_score",
+        "avg_q6"
+    ]
+
+    with open(output_csv, "w", newline="") as f:
+        writer = csv.DictWriter(f,fieldnames=fieldnames)
+        writer.writeheader()
+
+        tracked_particles = set(final_cluster_particles)
+        current_timestep = final_timestep
+        current_frame = final_frame
+
+        while current_timestep >= 0:
+            
+
+            if current_timestep == final_timestep:
+                cluster_id = final_cluster_id
+                cluster_size = len(tracked_particles)
+                overlap = np.nan
+                overlap_score = np.nan
+            else:
+                clusters = get_clusters_at_timestep(filename,current_timestep)
+                match_id, overlap, overlap_score = (find_best_cluster_match(tracked_particles,clusters))
+                if match_id is None:
+                    print(f"No reliable match found at timestep: {current_timestep}")
+                    break
+                tracked_particles = clusters[match_id]
+                cluster_id = match_id
+                cluster_size = len(tracked_particles)
+                
+            ids, positions, box = load_frame(filename, frame=current_frame)
+            average_q6 = calculate_cluster_q6(tracked_particles,ids,positions,box)
+            time_ns = current_timestep * 5e-6
+
+            writer.writerow({
+                "final_cluster_rank": 1,
+                "final_cluster_id": final_cluster_id,
+                "final_cluster_size": final_cluster_size,
+                "timestep": current_timestep,
+                "time_ns": time_ns,
+                "cluster_id": cluster_id,
+                "cluster_size": cluster_size,
+                "overlap": overlap,
+                "overlap_score": overlap_score,
+                "avg_q6": average_q6
+            })
+
+            current_timestep -= interval
+            current_frame -= 1
