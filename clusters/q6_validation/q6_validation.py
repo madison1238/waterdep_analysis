@@ -10,14 +10,18 @@ import os
 
 
 final_timestep,final_frame = find_last_timestep(config.dump)
-print(final_timestep)
 final_clusters = find_largest_clusters(config.dump,final_timestep)
 largest_id = list(final_clusters.keys())[0]
-print(largest_id)
 tracked_particles = final_clusters[largest_id]["particle_ids"]
-print(tracked_particles)
 
+previous_timestep = final_timestep - 100000
+clusters = get_clusters_at_timestep(config.dump,previous_timestep)
+match_id, overlap, score = find_best_cluster_match(tracked_particles,clusters)
 
+print(f"Final cluster: {largest_id}")
+print(f"Previous cluster: {match_id}")
+print(f"Overlap: {overlap}")
+print(f"Score: {score:.3f}")
 
 
 '''frame = 0
