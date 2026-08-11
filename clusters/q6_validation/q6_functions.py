@@ -102,7 +102,7 @@ def get_clusters_at_timestep(filename, target_timestep):
             for i in range(num_atoms):
                 parts = f.readline().split()
 
-                particle_id = int(parts[0])
+                particle_id = int(float(parts[0]))
                 cluster_id = int(float(parts[5]))
 
                 clusters[cluster_id].add(particle_id)
