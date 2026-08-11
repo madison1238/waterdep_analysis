@@ -1,4 +1,5 @@
 import numpy as np
+from collections import defaultdict
 
 def find_last_timestep(filename):
     final_frame = -1
@@ -29,39 +30,51 @@ def find_last_timestep(filename):
                 
                 
 
-def find_largest_clusters(filename):
-    cluster_sizes = {}
+def find_largest_clusters(filename, final_timestep):
+    clusters = defaultdict(list)
+
     with open(filename, 'r') as f:
         while True:
             line = f.readline()
 
             if not line:
                 break
-            if line.strip() == "ITEM: TIMESTEP":
-                timestep = int(f.readline().strip())
-            
-                f.readline()
-                num_atoms = int(float(f.readline().strip()))
+            if line.strip() != "ITEM: TIMESTEP":
+                continue
 
-                f.readline()
-                f.readline()
-                f.readline()
-                f.readline()
-                f.readline()
+            timestep = int(f.readline().strip())
+            if timestep != final_timestep: continue
+        
+            f.readline()
+            num_atoms = int(float(f.readline().strip()))
 
-                cluster_sizes = {}
+            f.readline()
+            f.readline()
+            f.readline()
+            f.readline()
+            f.readline()
 
-                for i in range(num_atoms):
-                    line = f.readline()
-                    cluster_id = int(float(line.split()[5]))
-                    cluster_sizes[cluster_id] = (cluster_sizes.get(cluster_id, 0) + 1)
+            for i in range(num_atoms):
+                line = f.readline()
+                parts = line.split()
+                particle_id = int(float(parts[0]))
+                cluster_id = int(float(parts[5]))
+                clusters[cluster_id].append(particle_id)
+            break
     top4 = sorted(
-        cluster_sizes.items(),
-        key=lambda x: x[1],
+        clusters.items(),
+        key=lambda x: len(x[1]),
         reverse=True
     )[:4]
 
-    return top4 
+    final_clusters = {}
+    for cluster_id, particle_ids in top4:
+        final_clusters[cluster_id] = {
+            "size": len(particle_ids),
+            "particle_ids": set(particle_ids)
+        }
+
+    return final_clusters 
 
 
 
