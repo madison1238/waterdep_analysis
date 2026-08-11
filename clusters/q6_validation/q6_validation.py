@@ -11,26 +11,16 @@ import os
 
 final_timestep,final_frame = find_last_timestep(config.dump)
 
+final_clusters = find_largest_clusters(config.dump,final_timestep)
+largest_id = list(final_clusters.keys())[0]
+tracked_particles = final_clusters[largest_id]["particle_ids"]
 
-test_timestep = final_timestep
-test_frame  = final_frame
+ids, positions, box = load_frame(config.dump,final_frame)
+average_q6 = calculate_cluster_q6(tracked_particles,ids,positions,box)
 
-clusters = get_clusters_at_timestep(config.dump,test_timestep)
-ids, positions, box = load_frame(config.dump,frame=test_frame)
-ovito_ids = set(ids)
-cluster_ids = set()
-
-for particle_ids in clusters.values():
-    cluster_ids.update(particle_ids)
-
-print("Number of particles from OVITO:", len(ovito_ids))
-print("Number of particles from clusters:", len(cluster_ids))
-
-print("IDs missing from cluster parser:", len(ovito_ids - cluster_ids))
-print("IDs missing from OVITO:", len(cluster_ids - ovito_ids))
-
-
-
+print(f"Final cluster: {largest_id}")
+print(f"Cluster size: {len(tracked_particles)}")
+print(f"Average Q6: {average_q6:.4f}")
 
 
 
