@@ -1,5 +1,6 @@
 import numpy as np
 from collections import defaultdict
+from pyscal_methods import *
 
 def find_last_timestep(filename):
     final_frame = -1
@@ -126,8 +127,14 @@ def find_best_cluster_match(tracked_particles, clusters):
             best_cluster_id = cluster_id
     return best_cluster_id, best_overlap, best_score
 
+def calculate_cluster_q6(tracked_particles, ids, positions, box):
+    q6 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=6)
+    id_to_index = {particle_id: i for i, particle_id in enumerate(ids)}
+    tracked_indices = [id_to_index[particle_id]for particle_id in tracked_particles if particle_id in id_to_index]
 
-
+    cluster_q6 = q6[tracked_indices]
+    average_q6 = np.mean(cluster_q6)
+    return average_q6
 
 def get_dominant_phase_per_cluster(cluster_ids, labels):
     cluster_ids = np.asarray(cluster_ids)
