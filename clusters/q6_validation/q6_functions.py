@@ -154,7 +154,7 @@ def get_dominant_phase_per_cluster(cluster_ids, labels):
 
 
 def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id, 
-                     final_cluster_particles, final_cluster_size, 
+                     final_cluster_particles, final_cluster_size, final_cluster_rank,
                      interval, output_csv):
     fieldnames = [
         "final_cluster_rank",
@@ -194,13 +194,13 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
                 tracked_particles = clusters[match_id]
                 cluster_id = match_id
                 cluster_size = len(tracked_particles)
-                
+
             ids, positions, box = load_frame(filename, frame=current_frame)
             average_q6 = calculate_cluster_q6(tracked_particles,ids,positions,box)
             time_ns = current_timestep * 5e-6
 
             writer.writerow({
-                "final_cluster_rank": 1,
+                "final_cluster_rank": final_cluster_rank,
                 "final_cluster_id": final_cluster_id,
                 "final_cluster_size": final_cluster_size,
                 "timestep": current_timestep,
