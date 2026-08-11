@@ -39,28 +39,26 @@ def find_largest_clusters(filename, final_timestep):
 
             if not line:
                 break
-            if line.strip() != "ITEM: TIMESTEP":
-                continue
+            if line.strip() == "ITEM: TIMESTEP":
 
-            timestep = int(f.readline().strip())
-            if timestep != final_timestep: continue
-        
-            f.readline()
-            num_atoms = int(float(f.readline().strip()))
+                timestep = int(f.readline().strip())
+                if timestep != final_timestep: continue
+            
+                f.readline()
+                num_atoms = int(float(f.readline().strip()))
 
-            f.readline()
-            f.readline()
-            f.readline()
-            f.readline()
-            f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
 
-            for i in range(num_atoms):
-                line = f.readline()
-                parts = line.split()
-                particle_id = int(float(parts[0]))
-                cluster_id = int(float(parts[5]))
-                clusters[cluster_id].append(particle_id)
-            break
+                for i in range(num_atoms):
+                    line = f.readline()
+                    parts = line.split()
+                    particle_id = int(float(parts[0]))
+                    cluster_id = int(float(parts[5]))
+                    clusters[cluster_id].append(particle_id)
     top4 = sorted(
         clusters.items(),
         key=lambda x: len(x[1]),
@@ -86,29 +84,26 @@ def get_clusters_at_timestep(filename, target_timestep):
             if not line:
                 break
 
-            if line.strip() != "ITEM: TIMESTEP":
-                continue
+            if line.strip() == "ITEM: TIMESTEP":
 
-            timestep = int(f.readline().strip())
-            if timestep != target_timestep: continue
-            f.readline()
-            num_atoms = int(f.readline().strip())
+                timestep = int(f.readline().strip())
+                if timestep != target_timestep: continue
+                f.readline()
+                num_atoms = int(f.readline().strip())
 
-            f.readline()
-            f.readline()
-            f.readline()
-            f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
 
-            for i in range(num_atoms):
-                parts = f.readline().split()
+                for i in range(num_atoms):
+                    parts = f.readline().split()
 
-                particle_id = int(float(parts[0]))
-                cluster_id = int(float(parts[5]))
+                    particle_id = int(float(parts[0]))
+                    cluster_id = int(float(parts[5]))
 
-                clusters[cluster_id].add(particle_id)
-
-            break
-
+                    clusters[cluster_id].add(particle_id)
     return clusters
 
 
