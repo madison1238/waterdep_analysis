@@ -76,10 +76,8 @@ def find_largest_clusters(filename, final_timestep):
 
     return final_clusters 
 
-
-
-def get_cluster_members(filename):
-    cluster_members = {}
+def get_clusters_at_timestep(filename, target_timestep):
+    clusters = defaultdict(set)
 
     with open(filename, 'r') as f:
         while True:
@@ -88,49 +86,50 @@ def get_cluster_members(filename):
             if not line:
                 break
 
-            if line.strip() == "ITEM: TIMESTEP":
+            if line.strip() != "ITEM: TIMESTEP":
+                continue
 
-                timestep = int(f.readline().strip())
+            timestep = int(f.readline().strip())
+            if timestep != target_timestep: continue
+            f.readline()
+            num_atoms = int(f.readline().strip())
 
-                f.readline()
-                num_atoms = int(float(f.readline().strip()))
+            f.readline()
+            f.readline()
+            f.readline()
+            f.readline()
 
-                for _ in range(5):
-                    f.readline()
+            for i in range(num_atoms):
+                parts = f.readline().split()
 
-                cluster_members = {}
+                particle_id = int(parts[0])
+                cluster_id = int(float(parts[5]))
 
-                for _ in range(num_atoms):
+                clusters[cluster_id].add(particle_id)
 
-                    line = f.readline().split()
+            break
 
-                    cid = int(float(line[5]))
-                    atom_id = int(float(line[0]))
-
-                    if cid not in cluster_members:
-                        cluster_members[cid] = set()
-
-                    cluster_members[cid].add(atom_id)
-
-    return cluster_members
+    return clusters
 
 
-def find_matching_cluster(target_atoms, cluster_members, min_overlap=1):
-    best_cluster = None
+
+def find_best_cluster_match(tracked_particles, clusters):
+    best_cluster_id = None
     best_overlap = 0
+    best_score = 0
 
-    for cluster_id, members in cluster_members.items():
+    tracked_size = len(tracked_particles)
+    if tracked_size == 0:
+        return None, 0, 0.0
 
-        overlap = len(target_atoms & members)
-
-        if overlap > best_overlap:
+    for cluster_id, particle_ids in clusters.items():
+        overlap = len(tracked_particles & particle_ids)
+        score = overlap /tracked_size
+        if score > best_score:
+            best_score = score
             best_overlap = overlap
-            best_cluster = cluster_id
-
-    if best_overlap < min_overlap:
-        return None, best_overlap
-
-    return best_cluster, best_overlap
+            best_cluster_id = cluster_id
+    return best_cluster_id, best_overlap, best_score
 
 
 
