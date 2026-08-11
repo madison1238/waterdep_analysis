@@ -135,6 +135,9 @@ def calculate_cluster_q6(tracked_particles, ids, positions, box):
     tracked_indices = [id_to_index[particle_id]for particle_id in tracked_particles if particle_id in id_to_index]
 
     cluster_q6 = q6[tracked_indices]
+    nan_count = np.isnan(cluster_q6).sum()
+    print(f"Cluster particles: {len(cluster_q6)}, "f"NaN Q6 values: {nan_count}")
+
     average_q6 = np.mean(cluster_q6)
     return average_q6
 

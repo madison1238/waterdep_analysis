@@ -17,5 +17,9 @@ def pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.
         q=pyscal.steinhardt_parameter(atoms, l=[param])[0]
     else:
         q = pyscal.steinhardt_parameter(atoms, l=[param], averaged=True)[0]
+
+    print(
+    f"Total Q6 values: {len(q)}, "
+    f"NaN Q6 values: {np.isnan(q).sum()}")
     
     return q
