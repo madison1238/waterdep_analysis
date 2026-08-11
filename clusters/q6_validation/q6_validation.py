@@ -12,20 +12,26 @@ import os
 final_timestep,final_frame = find_last_timestep(config.dump)
 
 final_clusters = find_largest_clusters(config.dump,final_timestep)
-for rank, (cluster_id, size) in enumerate(final_clusters, start=1):
+for rank, (cluster_id, cluster_data) in enumerate(final_clusters.items(), start=1):
     print(
         f"Rank {rank} "
         f"Cluster {cluster_id}, "
-        f"Size {size}"
+        f"Size {cluster_data['size']}"
     )
-clusters_at_final = get_clusters_at_timestep(config.dump,final_timestep)
-for rank, (cluster_id, cluster_size) in enumerate(final_clusters,start=1):
+
+for rank, (cluster_id, cluster_data) in enumerate(final_clusters.items(),start=1):
+
+    final_cluster_size = cluster_data["size"]
+    final_cluster_particles = cluster_data["particle_ids"]
+
     print("\n" + "=" * 60)
     print(f"Tracking final cluster rank {rank}")
     print(f"Cluster ID: {cluster_id}")
-    print(f"Cluster size: {cluster_size}")
+    print(f"Cluster size: {final_cluster_size}")
+    print(f"Number of particle IDs:{len(final_cluster_particles)}")
     print("=" * 60)
-    final_cluster_particles = clusters_at_final[cluster_id]
+
+
     output_csv = (f"{config.output}/cluster_q6_tracking_rank{rank}_cluster{cluster_id}.csv")
 
     track_cluster_q6(
@@ -34,7 +40,7 @@ for rank, (cluster_id, cluster_size) in enumerate(final_clusters,start=1):
         final_frame=final_frame,
         final_cluster_id=cluster_id,
         final_cluster_particles=final_cluster_particles,
-        final_cluster_size=cluster_size,
+        final_cluster_size=final_cluster_size,
         final_cluster_rank=rank,
         interval=10000,
         output_csv=output_csv
