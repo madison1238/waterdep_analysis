@@ -156,6 +156,8 @@ def get_dominant_phase_per_cluster(cluster_ids, labels):
 def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id, 
                      final_cluster_particles, final_cluster_size, final_cluster_rank,
                      interval, output_csv):
+    print(f"Starting tracking for cluster {final_cluster_id}",flush=True)
+    
     fieldnames = [
         "final_cluster_rank",
         "final_cluster_id",
@@ -172,6 +174,7 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
     with open(output_csv, "w", newline="") as f:
         writer = csv.DictWriter(f,fieldnames=fieldnames)
         writer.writeheader()
+        f.flush()
 
         tracked_particles = set(final_cluster_particles)
         current_timestep = final_timestep
@@ -211,6 +214,17 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
                 "overlap_score": overlap_score,
                 "avg_q6": average_q6
             })
+            f.flush()
+
+            print(
+                f"Timestep: {current_timestep}, "
+                f"Cluster: {cluster_id}, "
+                f"Size: {cluster_size}, "
+                f"Overlap: {overlap}, "
+                f"Score: {overlap_score}, "
+                f"Q6: {average_q6:.4f}",
+                flush=True
+            )
 
             current_timestep -= interval
             current_frame -= 1
