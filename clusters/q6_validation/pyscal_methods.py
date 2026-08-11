@@ -17,7 +17,5 @@ def pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.
         q=pyscal.steinhardt_parameter(atoms, l=[param])[0]
     else:
         q = pyscal.steinhardt_parameter(atoms, l=[param], averaged=True)[0]
-    print(type(q))
-    print(len(q))
     
     return q
