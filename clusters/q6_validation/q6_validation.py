@@ -10,15 +10,18 @@ import os
 
 
 frame = 0
-largest_cluster_size = []
-largest_q6_freud = []
-largest_q6_pyscal = []
+
+
+
 
 os.makedirs(config.output, exist_ok=True)
 
 with open(config.txt_file, 'w') as out:
     out.write("Q6 SUMMARY\n")
     out.write(f"{'=' * 20}\n\n")
+
+final_timestep,final_frame = find_last_timestep(config.dump)
+four_largest = find_largest_clusters(config.dump, final_timestep)
 
 
 with open(config.dump, 'r') as f:
@@ -61,9 +64,6 @@ with open(config.dump, 'r') as f:
             
             ids, positions, box, labels = load_frame(config.dump, frame, True)
 
-            #cluster_lammps = average_q6_per_cluster(lammps_q6_timestep,cluster_ids)
-            #lammps_cluster_q6 = [c["avg_q6"]for c in cluster_lammps.values()]
-            
 
             #CUTOFF
             '''print("working on q6 with freud cutoff...")
