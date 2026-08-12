@@ -9,10 +9,9 @@ import os
 import csv
 
 
-plot_particle_q4_q6(f"{config.output}/single_particle_q4_q6.csv", f"{config.output}/single_particle_q4_q6.png")
 
+final_timestep, final_frame = find_last_timestep(config.dump)
 
-frame = 0
 os.makedirs(config.output, exist_ok=True)
 
 with open(config.dump, 'r') as f:
@@ -23,6 +22,7 @@ with open(config.dump, 'r') as f:
             break
         if line.strip() == "ITEM: TIMESTEP":
             timestep = int(f.readline().strip())
+            if timestep != final_timestep: continue
         
             f.readline()
             num_atoms = int(float(f.readline().strip()))
@@ -39,7 +39,7 @@ with open(config.dump, 'r') as f:
 
                 
             
-        ids, positions, box, labels = load_frame(config.dump, frame, True)
+        ids, positions, box, labels = load_frame(config.dump, final_frame, True)
 
 
             
@@ -105,7 +105,7 @@ with open(config.dump, 'r') as f:
             out.write(f"Max: {max(avg_pyscal_voronoi)}\n")
             out.write(f"Avg: {sum(avg_pyscal_voronoi) / len(avg_pyscal_voronoi)}\n\n")'''
 
-        frame += 1
+        #frame += 1
 
 
         
