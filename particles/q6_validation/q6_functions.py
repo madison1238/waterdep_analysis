@@ -5,6 +5,34 @@ from freud_methods import *
 from pyscal_methods import *
 
 
+def find_last_timestep(filename):
+    final_frame = -1
+    final_timestep = None
+    with open(filename, 'r') as f:
+        while True:
+            line = f.readline()
+
+            if not line:
+                break
+            if line.strip() == "ITEM: TIMESTEP":
+                timestep = int(f.readline().strip())
+                final_timestep = timestep
+                final_frame += 1
+            
+                f.readline()
+                num_atoms = int(float(f.readline().strip()))
+
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+                f.readline()
+
+                for i in range(num_atoms):
+                    line = f.readline()
+    return final_timestep, final_frame
+
+
 def track_particle_order(positions, box, ids, target_id, cutoff=3.5):
     if target_id not in ids:
         raise ValueError(f"Particle ID {target_id} not found in frame.")
