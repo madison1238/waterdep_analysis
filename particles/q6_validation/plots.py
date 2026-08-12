@@ -45,9 +45,10 @@ def plot_phase_summary(methods, titles, filename, txt_file):
             ax.hlines(y,minimum,maximum,color=color, linewidth=1.5)
             ax.hlines(y,low,high, color=color,linewidth=8)
             ax.scatter(mean,y,color="black", s=35, zorder=5)
-        ax.set_title(title)
+        ax.set_title(title, fontsize=18)
         ax.set_yticks(range(len(phases)))
-        ax.set_yticklabels([f"{phase_labels[p]}\n(n={len(phase_data[p])})"for p in phases])
+        ax.set_yticklabels([f"{phase_labels[p]}\n(n={len(phase_data[p])})"for p in phases], fontsize=14)
+        ax.tick_params(axis="x", labelsize=14)
         ax.grid(axis="x", alpha=0.3)
     
     all_values = []
@@ -61,8 +62,8 @@ def plot_phase_summary(methods, titles, filename, txt_file):
     for ax in axes:
         ax.set_xlim(xmin, xmax)
     
-    fig.supxlabel("q6 Value")
-    fig.supylabel("Phase")
+    fig.supxlabel("q6 Value", fontsize=18)
+    fig.supylabel("Phase", fontsize=18)
     plt.tight_layout()
     plt.savefig(filename)
 
