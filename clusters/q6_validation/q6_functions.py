@@ -142,7 +142,7 @@ def calculate_cluster_q6(tracked_particles, ids, positions, box):
         print("WARNING: No valid Q6 values for this cluster!", flush=True)
         return np.nan
 
-    average_q6 = np.mean(cluster_q6)
+    average_q6 = np.nanmean(cluster_q6)
     return average_q6
 
 def get_dominant_phase_per_cluster(cluster_ids, labels):
