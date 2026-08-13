@@ -136,7 +136,11 @@ def calculate_cluster_q6(tracked_particles, ids, positions, box):
 
     cluster_q6 = q6[tracked_indices]
     nan_count = np.isnan(cluster_q6).sum()
-    print(f"Cluster particles: {len(cluster_q6)}, "f"NaN Q6 values: {nan_count}")
+    valid_count = np.count_nonzero(~np.isnan(cluster_q6))
+    print(f"Cluster particles: {len(cluster_q6)}, "f"NaN Q6 values: {nan_count}", flush=True)
+    if valid_count == 0:
+        print("WARNING: No valid Q6 values for this cluster!", flush=True)
+        return np.nan
 
     average_q6 = np.mean(cluster_q6)
     return average_q6
