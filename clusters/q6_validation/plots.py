@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import config
 import os
+import csv
 from ovito.modifiers import ChillPlusModifier
 
 def plot_cluster_q6_history(cluster_history):
@@ -181,3 +182,54 @@ def plot_final_q6_vs_q4_color(final_results):
     plt.tight_layout(rect=[0.05, 0.12, 1, 1])
     plt.savefig(f"{config.output}/q4_vs_q6_color.png",bbox_inches="tight")
     plt.close()
+
+
+def plot_trakcing_cluster_q6(csv_files, output_file):
+    os.makedirs(output_file, exist_ok=True)
+
+    for csv_file in csv_files:
+        time_ns = []
+        avg_q6 = []
+
+        with open(csv_file, 'r', newline="") as file:
+            reader = csv.DictReader(file)
+
+            rank = None
+
+            for row in reader:
+                time_ns.append(float(row["time_ns"]))
+
+                if rank is None:
+                    rank = int(row["final_cluster_rank"])
+                
+                if row["avg_q6"].lower() == "nan":
+                    avg_q6.append(0)
+                else:
+                    avg_q6.append(float(row["avg_q6"]))
+        data = sorted(zip(time_ns, avg_q6))
+
+        if data:
+            time_ns, avg_q6 = zip(*data)
+            plt.figure
+            plt.plot(time_ns,avg_q6,linewidth=2,alpha=0.8)
+
+            plt.xlabel("Time (ns)")
+            plt.ylabel("Average Q6")
+
+            if rank == 1:
+                plt.title("Q6 Evolution of Largest Cluster")
+                save = f"{output_file}/1_q6_tracking.png"
+            elif rank == 2:
+                plt.title("Q6 Evolution of Second Largest Cluster")
+                save = f"{output_file}/2_q6_tracking.png"
+            elif rank == 3:
+                plt.title("Q6 Evolution of Third Largest Cluster")
+                save = f"{output_file}/3_q6_tracking.png"
+            elif rank == 4:
+                plt.title("Q6 Evolution of Fourth Largest Cluster")
+                save = f"{output_file}/4_q6_tracking.png"
+
+            plt.tight_layout()
+            plt.savefig(save)
+            plt.close()
+
