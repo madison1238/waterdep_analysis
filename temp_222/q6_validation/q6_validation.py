@@ -1,23 +1,24 @@
-print("Python started", flush=True)
-
 from ovito.io import import_file
-
-print("OVITO import successful", flush=True)
-
+from ovito.modifiers import ChillPlusModifier
 import config
 
-print("Config import successful", flush=True)
-
-print("Dump path:", config.dump, flush=True)
+print("Loading trajectory...", flush=True)
 
 pipeline = import_file(config.dump)
 
-print("Dump import successful", flush=True)
+print("Adding CHILL+...", flush=True)
 
-print("Frames:", pipeline.source.num_frames, flush=True)
+pipeline.modifiers.append(
+    ChillPlusModifier()
+)
+
+print("Computing frame 0...", flush=True)
 
 data = pipeline.compute(0)
 
-print("Frame computed", flush=True)
+print("CHILL+ successful!", flush=True)
 
-print(data.particles.keys(), flush=True)
+print("Particle properties:", flush=True)
+
+for name in data.particles.keys():
+    print(name, flush=True)
