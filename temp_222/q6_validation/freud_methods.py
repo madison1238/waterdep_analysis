@@ -55,9 +55,6 @@ def steinhardt_voronoi(box,positions,average=False,l=6):
     vor = freud.locality.Voronoi()
     vor.compute((box, positions))
 
-    #counts = np.bincount(vor.nlist.query_point_indices, minlength=len(positions))
-    #print("Average Voronoi neighbors:", counts.mean())
-    
     q = freud.order.Steinhardt(l=l,average=average)
     q.compute((box, positions),neighbors=vor.nlist)
     return q.particle_order

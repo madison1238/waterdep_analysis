@@ -24,11 +24,6 @@ def load_frame(filename, frame=0, use_chill=False):
 
     if use_chill:
         labels = np.asarray(data.particles["Structure Type"])
-        '''print(data.attributes["ChillPlus.counts.OTHER"])
-        print(data.attributes["ChillPlus.counts.HEXAGONAL_ICE"])
-        print(data.attributes["ChillPlus.counts.CUBIC_ICE"])
-        print(data.attributes["ChillPlus.counts.INTERFACIAL_ICE"])'''
-
         return ids, positions, box, labels
 
     return ids, positions, box
