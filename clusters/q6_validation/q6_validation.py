@@ -7,7 +7,7 @@ from ovito.modifiers import ChillPlusModifier
 import config
 import os
 
-files = ['cluster_q6_tracking_rank1_cluster755.csv', 'cluster_q6_tracking_rank2_cluster933.csv', 'cluster_q6_tracking_rank3_cluster6816.csv', 'cluster_q6_tracking_rank4_cluster3557.csv' ]
+files = [f'{config.output}/cluster_q6_tracking_rank1_cluster755.csv', f'{config.output}/cluster_q6_tracking_rank2_cluster933.csv', f'{config.output}/cluster_q6_tracking_rank3_cluster6816.csv', f'{config.output}/cluster_q6_tracking_rank4_cluster3557.csv' ]
 
 
 plot_trakcing_cluster_q6(files, f"{config.output}/4_largest_sq6")
