@@ -12,7 +12,7 @@ ALL_FRAMES = False
 FRAME = 0
 
 #dump file to read
-dump = '../dump.cluster_q6.lammpstrj'
+dump = 'dump.mWC2.lammpstrj'
 
 #output folder for graphs
 output = '../summary/comparisons'

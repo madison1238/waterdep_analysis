@@ -1,9 +1,14 @@
-from ovito_utils import load_frame
-from freud_methods import *
-from pyscal_methods import *
-from q6_functions import *
-from plots import *
-from ovito.modifiers import ChillPlusModifier
+from ovito.io import import_file
+from ovito.modifiers import (
+    ChillPlusModifier,
+    ExpressionSelectionModifier,
+    DeleteSelectedModifier,
+    ClusterAnalysisModifier
+)
 import config
-import os
 
+
+pipeline = import_file(config.dump)
+pipeline.modifiers.append(ChillPlusModifier())
+data = pipeline.compute(0)
+print(data.particles.keys())
