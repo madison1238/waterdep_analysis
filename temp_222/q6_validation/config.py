@@ -15,5 +15,5 @@ FRAME = 0
 dump = '../dump.mWC2.lammpstrj'
 
 #output folder for graphs
-output = '../summary/comparisons'
+output = '../summary'
 txt_file = '../summary/comparisons/comparison.txt'
