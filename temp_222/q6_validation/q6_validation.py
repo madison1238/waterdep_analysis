@@ -1,24 +1,21 @@
 from ovito.io import import_file
-from ovito.modifiers import ChillPlusModifier
+from ovito.modifiers import (
+    ChillPlusModifier,
+    ExpressionSelectionModifier,
+    ClusterAnalysisModifier
+)
 import config
-
-print("Loading trajectory...", flush=True)
+import numpy as np
 
 pipeline = import_file(config.dump)
-
-print("Adding CHILL+...", flush=True)
-
-pipeline.modifiers.append(
-    ChillPlusModifier()
-)
-
-print("Computing frame 0...", flush=True)
-
+pipeline.modifiers.append(ChillPlusModifier())
+pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
 data = pipeline.compute(0)
+structure_types = np.asarray(data.particles["Structure Type"])
+selection = np.asarray(data.particles["Selection"])
 
-print("CHILL+ successful!", flush=True)
-
-print("Particle properties:", flush=True)
-
-for name in data.particles.keys():
-    print(name, flush=True)
+print("Structure types:")
+print(np.unique(structure_types, return_counts=True))
+print("Number selected:", np.sum(selection))
+print("Number Ih:", np.sum(structure_types == 1))
+print("Number Ic:", np.sum(structure_types == 2))
