@@ -24,27 +24,32 @@ def compare_neighbors(positions, box, ids, target_id, cutoff=3.5):
     aq = freud.locality.AABBQuery(box, positions)
     freud_neighbors = aq.query(positions[target_index],{"r_max": cutoff, "exclude_ii": True}).toNeighborList()
     freud_indices = freud_neighbors.point_indices
+    freud_distances = freud_neighbors.distances
 
     atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
     pyscal.find_neighbors(atoms,method="cutoff",cutoff=cutoff)
-    pyscal_indices = np.array(atoms[target_index].neighbors)
+    pyscal_indices = atoms.arrays["pyscal_neighbors"][target_index]
+    pyscal_distances = atoms.arrays["pyscal_neighbordist"][target_index]
+    valid = pyscal_indices >= 0
+    pyscal_indices = pyscal_indices[valid]
+    pyscal_distances = pyscal_distances[valid]
 
     print("\n" + "=" * 60)
     print("FREUD")
     print("=" * 60)
     print(f"Number of neighbors: {len(freud_indices)}")
-    print("\nID\tIndex")
-    for index in freud_indices:
-        print(f"{ids[index]}\t{index}")
+    print("\nID\tIndex\tDistance")
+    for index, distance in zip(freud_indices, freud_distances):
+        print(f"{ids[index]}\t"f"{index}\t"f"{distance:.6f}")
 
 
     print("\n" + "=" * 60)
     print("PYSCAL")
     print("=" * 60)
     print(f"Number of neighbors: {len(pyscal_indices)}")
-    print("\nID\tIndex")
-    for index in pyscal_indices:
-        print(f"{ids[index]}\t{index}")
+    print("\nID\tIndex\tDistance")
+    for index, distance in zip(pyscal_indices, pyscal_distances):
+        print(f"{ids[index]}\t"f"{index}\t"f"{distance:.6f}")
 
     freud_set = set(freud_indices)
     pyscal_set = set(pyscal_indices)
@@ -56,7 +61,9 @@ def compare_neighbors(positions, box, ids, target_id, cutoff=3.5):
     print(f"Same neighbors: {freud_set == pyscal_set}")
 
     print("\nOnly in Freud:")
-    print([(ids[i], i) for i in sorted(freud_set - pyscal_set)])
+    for index in sorted(freud_set - pyscal_set):
+        print(f"ID: {ids[index]}, "f"Index: {index}")
 
     print("\nOnly in Pyscal:")
-    print([(ids[i], i) for i in sorted(pyscal_set - freud_set)])
+    for index in sorted(pyscal_set - freud_set):
+        print(f"ID: {ids[index]}, "f"Index: {index}")
