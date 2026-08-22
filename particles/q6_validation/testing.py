@@ -21,8 +21,8 @@ def compare_neighbors(positions, box, ids, target_id, cutoff=3.5):
     print(f"Position: {positions[target_index]}")
     print(f"Cutoff: {cutoff} Å")
 
-    freud_q6 = steinhardt_cutoff(box,positions,cutoff=3.5,average=False,l=6)[target_index]
-    freud_q4 = steinhardt_cutoff(box,positions,cutoff=3.5,average=False,l=4)[target_index]
+    freud_q6 = steinhardt_cutoff_no_self(box,positions,cutoff=3.5,average=False,l=6)[target_index]
+    freud_q4 = steinhardt_cutoff_no_self(box,positions,cutoff=3.5,average=False,l=4)[target_index]
     pyscal_q6 = pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.5, param=6)[target_index]
     pyscal_q4 = pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.5, param=4)[target_index]
 
