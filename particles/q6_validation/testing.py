@@ -29,17 +29,17 @@ def compare_neighbors(positions, box, ids, target_id, cutoff=3.5):
     atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
     pyscal.find_neighbors(atoms,method="cutoff",cutoff=cutoff)
     print("\n" + "=" * 60)
-    print("PYSCAL DEBUG")
+    print("PYSCAL NEIGHBOR DATA FOR TARGET")
     print("=" * 60)
 
-    print("Atoms type:")
-    print(type(atoms))
+    print("Neighbor indices:")
+    print(atoms.info["pyscal_neighbors"][target_index])
 
-    print("\nAtoms arrays:")
-    print(atoms.arrays.keys())
+    print("\nNeighbor distances:")
+    print(atoms.info["pyscal_neighbordist"][target_index])
 
-    print("\nAtoms info:")
-    print(atoms.info)
+    print("\nNeighbor weights:")
+    print(atoms.info["pyscal_neighborweight"][target_index])
     '''pyscal_indices = atoms.arrays["pyscal_neighbors"][target_index]
     pyscal_distances = atoms.arrays["pyscal_neighbordist"][target_index]
     valid = pyscal_indices >= 0
