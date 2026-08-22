@@ -1,15 +1,8 @@
 import freud
 import numpy as np
 
-def steinhardt_cutoff(box,positions,cutoff=3.5,average=False,l=6):
-    aq = freud.locality.AABBQuery(box, positions)
-    neighbors = aq.query(positions,dict(r_max=cutoff)).toNeighborList()
 
-    q = freud.order.Steinhardt(l=l, average=average)
-    q.compute((box, positions),neighbors=neighbors)
-    return q.particle_order
-
-def steinhardt_cutoff_no_self(box, positions, cutoff=3.5, average=False, l=6):
+def steinhardt_cutoff(box, positions, cutoff=3.5, average=False, l=6):
     aq = freud.locality.AABBQuery(box, positions)
     neighbors = aq.query(positions,{"r_max": cutoff, "exclude_ii": True}).toNeighborList()
 
