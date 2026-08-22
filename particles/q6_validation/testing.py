@@ -21,61 +21,27 @@ def compare_neighbors(positions, box, ids, target_id, cutoff=3.5):
     print(f"Position: {positions[target_index]}")
     print(f"Cutoff: {cutoff} Å")
 
-    aq = freud.locality.AABBQuery(box, positions)
-    freud_neighbors = aq.query(positions[target_index],{"r_max": cutoff, "exclude_ii": True}).toNeighborList()
-    freud_indices = freud_neighbors.point_indices
-    freud_distances = freud_neighbors.distances
-
-    atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
-    pyscal.find_neighbors(atoms,method="cutoff",cutoff=cutoff)
-    print("\n" + "=" * 60)
-    print("PYSCAL NEIGHBOR DATA FOR TARGET")
-    print("=" * 60)
-
-    print("Neighbor indices:")
-    print(atoms.info["pyscal_neighbors"][target_index])
-
-    print("\nNeighbor distances:")
-    print(atoms.info["pyscal_neighbordist"][target_index])
-
-    print("\nNeighbor weights:")
-    print(atoms.info["pyscal_neighborweight"][target_index])
-    '''pyscal_indices = atoms.arrays["pyscal_neighbors"][target_index]
-    pyscal_distances = atoms.arrays["pyscal_neighbordist"][target_index]
-    valid = pyscal_indices >= 0
-    pyscal_indices = pyscal_indices[valid]
-    pyscal_distances = pyscal_distances[valid]
+    freud_q6 = steinhardt_cutoff(box,positions,cutoff=3.5,average=False,l=6)[target_index]
+    freud_q4 = steinhardt_cutoff(box,positions,cutoff=3.5,average=False,l=4)[target_index]
+    pyscal_q6 = pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.5, param=6)[target_index]
+    pyscal_q4 = pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.5, param=4)[target_index]
 
     print("\n" + "=" * 60)
-    print("FREUD")
+    print("RAW STEINHARDT VALUES")
     print("=" * 60)
-    print(f"Number of neighbors: {len(freud_indices)}")
-    print("\nID\tIndex\tDistance")
-    for index, distance in zip(freud_indices, freud_distances):
-        print(f"{ids[index]}\t"f"{index}\t"f"{distance:.6f}")
 
+    print("\nFREUD")
+    print(f"q4: {freud_q4}")
+    print(f"q6: {freud_q6}")
+
+    print("\nPYSCAL")
+    print(f"q4: {pyscal_q4}")
+    print(f"q6: {pyscal_q6}")
 
     print("\n" + "=" * 60)
-    print("PYSCAL")
+    print("DIFFERENCES")
     print("=" * 60)
-    print(f"Number of neighbors: {len(pyscal_indices)}")
-    print("\nID\tIndex\tDistance")
-    for index, distance in zip(pyscal_indices, pyscal_distances):
-        print(f"{ids[index]}\t"f"{index}\t"f"{distance:.6f}")
 
-    freud_set = set(freud_indices)
-    pyscal_set = set(pyscal_indices)
+    print(f"q4 difference: {freud_q4 - pyscal_q4}")
+    print(f"q6 difference: {freud_q6 - pyscal_q6}")
 
-    print("\n" + "=" * 60)
-    print("COMPARISON")
-    print("=" * 60)
-    print(f"Same number of neighbors: {len(freud_set) == len(pyscal_set)}")
-    print(f"Same neighbors: {freud_set == pyscal_set}")
-
-    print("\nOnly in Freud:")
-    for index in sorted(freud_set - pyscal_set):
-        print(f"ID: {ids[index]}, "f"Index: {index}")
-
-    print("\nOnly in Pyscal:")
-    for index in sorted(pyscal_set - freud_set):
-        print(f"ID: {ids[index]}, "f"Index: {index}")'''
