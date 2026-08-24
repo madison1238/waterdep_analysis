@@ -7,7 +7,25 @@ from ovito.modifiers import ChillPlusModifier
 import config
 import os
 
-final_timestep,final_frame = find_last_timestep(config.dump)
+
+ids, positions, box = load_frame(config.dump, frame=79)
+
+q6_normal = pyscal_steinhardt(positions, box,method="cutoff",averaged=False,cutoff=3.5,param=6)
+
+q6_averaged = pyscal_steinhardt(positions,box,method="cutoff",averaged=True,cutoff=3.5,param=6)
+
+print("\n========== FRAME 79 ==========")
+print("Normal q6 NaNs:", np.isnan(q6_normal).sum())
+print("Averaged q6 NaNs:", np.isnan(q6_averaged).sum())
+
+
+
+
+
+
+
+
+'''final_timestep,final_frame = find_last_timestep(config.dump)
 
 final_clusters = find_largest_clusters(config.dump,final_timestep)
 for rank, (cluster_id, cluster_data) in enumerate(final_clusters.items(), start=1):
@@ -42,7 +60,7 @@ for rank, (cluster_id, cluster_data) in enumerate(final_clusters.items(),start=1
         final_cluster_rank=rank,
         interval=10000,
         output_csv=output_csv
-    )
+    )'''
 
 
 
