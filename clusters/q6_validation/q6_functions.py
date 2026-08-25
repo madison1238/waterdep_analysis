@@ -1,6 +1,7 @@
 import numpy as np
 from collections import defaultdict
 from pyscal_methods import *
+from freud_methods import *
 from ovito_utils import * 
 import csv
 
@@ -130,7 +131,7 @@ def find_best_cluster_match(tracked_particles, clusters):
     return best_cluster_id, best_overlap, best_score
 
 def calculate_cluster_q6(tracked_particles, ids, positions, box):
-    q6 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=6)
+    q6 = steinhardt_cutoff(box,positions,averaged=True)
     id_to_index = {particle_id: i for i, particle_id in enumerate(ids)}
     tracked_indices = [id_to_index[particle_id]for particle_id in tracked_particles if particle_id in id_to_index]
 
