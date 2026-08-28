@@ -1,4 +1,5 @@
 from ovito.io import import_file
+from plots import *
 from ovito.modifiers import (
     ChillPlusModifier,
     ExpressionSelectionModifier,
@@ -11,7 +12,13 @@ import os
 
 
 
-pipeline = import_file(config.dump)
+plot_largest_vs_time(f"{config.output}/ice_clusters.csv", f"{config.output}/largest_vs_time.png")
+
+
+
+
+
+'''pipeline = import_file(config.dump)
 print("Frames:", pipeline.source.num_frames, flush=True)
 
 pipeline.modifiers.append(ChillPlusModifier())
@@ -64,7 +71,7 @@ with open(output_file, "w", newline="") as f:
             f"Clusters {num_clusters:4d} | "
             f"Largest {largest_cluster:4d}",
             flush=True
-        )
+        )'''
 
 
 
