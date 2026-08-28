@@ -4,7 +4,7 @@ import os
 import csv
 from ovito.modifiers import ChillPlusModifier
 
-def plot_largest_vs_time(filename):
+def plot_largest_vs_time(filename, save):
     with open(filename, "r") as file:
         reader = csv.DictReader(file)
         time_ps = []
@@ -22,4 +22,5 @@ def plot_largest_vs_time(filename):
     plt.ylabel("Largest Cluster Size")
     plt.title("Largest Cluster Size vs. Time")
     plt.tight_layout()
-    plt.show()
+    plt.savefig(save)
+    
