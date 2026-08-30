@@ -7,7 +7,7 @@ sims = 5
 sim_files = [f"../sim_{i+1}/summary/ice_clusters.csv" for i in range(sims) ]
 min_n = 5
 max_n = 60
-timestep = 5
+timestep_inteveral = 5
 
 all_first_passages = []
 for file_name in sim_files:
@@ -24,7 +24,7 @@ for n in range(min_n, max_n+1):
             times.append(timestep)
     if len(times) > 0:
         mean_timestep = sum(times) / len(times)
-        mean_ns = mean_timestep * timestep * 1e-6
+        mean_ns = mean_timestep * timestep_inteveral * 1e-6
         mfpt[n] = mean_ns
 
     else:
@@ -50,7 +50,7 @@ with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
         for sim in all_first_passages:
             timestep = sim[n]
         if timestep is not None:
-            time_ns = timestep * timestep * 1e-6
+            time_ns = timestep * timestep_inteveral * 1e-6
             row.append(time_ns)
         else:
             row.append("")
