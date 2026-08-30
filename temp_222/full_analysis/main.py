@@ -1,4 +1,5 @@
 from functions import get_first_passage_times
+from plot import * 
 import csv
 import os
 
@@ -57,4 +58,4 @@ with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
         row.append(mfpt[n])
         writer.writerow(row)
 
-
+plot_MFPT_v_n(f"../summary/MFPT_vs_n.png")
