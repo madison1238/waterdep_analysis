@@ -45,15 +45,15 @@ with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
         "MFPT_ns"
     ])
 
-    for n in range(min_n,max_n):
+    for n in range(min_n,max_n+1):
         row = [n]
         for sim in all_first_passages:
             timestep = sim[n]
-        if timestep is not None:
-            time_ns = timestep * timestep_inteveral * 1e-6
-            row.append(time_ns)
-        else:
-            row.append("")
+            if timestep is not None:
+                time_ns = timestep * timestep_inteveral * 1e-6
+                row.append(time_ns)
+            else:
+                row.append("")
         row.append(mfpt[n])
         writer.writerow(row)
 
