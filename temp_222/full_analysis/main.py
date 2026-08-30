@@ -24,8 +24,8 @@ for n in range(min_n, max_n+1):
             times.append(timestep)
     if len(times) > 0:
         mean_timestep = sum(times) / len(times)
-        mean_ns = mean_timestep * timestep_inteveral * 1e-6
-        mfpt[n] = mean_ns
+        mean_ps = mean_timestep * timestep_inteveral * 1e-3
+        mfpt[n] = mean_ps
 
     else:
         mfpt[n] = None
@@ -37,12 +37,12 @@ with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
 
     writer.writerow([
         "n",
-        "sim1_ns",
-        "sim2_ns",
-        "sim3_ns",
-        "sim4_ns",
-        "sim5_ns",
-        "MFPT_ns"
+        "sim1_ps",
+        "sim2_ps",
+        "sim3_ps",
+        "sim4_ps",
+        "sim5_ps",
+        "MFPT_ps"
     ])
 
     for n in range(min_n,max_n+1):
@@ -50,8 +50,8 @@ with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
         for sim in all_first_passages:
             timestep = sim[n]
             if timestep is not None:
-                time_ns = timestep * timestep_inteveral * 1e-6
-                row.append(time_ns)
+                time_ps = timestep * timestep_inteveral * 1e-3
+                row.append(time_ps)
             else:
                 row.append("")
         row.append(mfpt[n])
