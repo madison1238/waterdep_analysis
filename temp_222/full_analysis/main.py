@@ -1,5 +1,6 @@
 from functions import get_first_passage_times
 import csv
+import os
 
 
 sims = 5
@@ -29,8 +30,9 @@ for n in range(min_n, max_n+1):
     else:
         mfpt[n] = None
 
-output_file = 'MFPT.csv'
-with open(output_file, 'w', newline="") as file:
+output_folder = '../summary'
+os.makedirs(output_folder,exist_ok=True)
+with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
     writer = csv.writer(file)
 
     writer.writerow([
