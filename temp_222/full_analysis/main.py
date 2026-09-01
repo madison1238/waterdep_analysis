@@ -4,8 +4,8 @@ import csv
 import os
 
 
-max_n = 6
-min_n = 5
+max_n = 12
+min_n = 3
 sim_dirs = 5
 sim_files = [f"../sim_{i+1}/summary/ice_clusters.csv"for i in range(sim_dirs)]
 
