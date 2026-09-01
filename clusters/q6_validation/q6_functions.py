@@ -254,27 +254,16 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
 
 
 def debug_cluster_q6(filename, timestep, frame, cluster_id):
+    print(f"Timestep: {timestep}", flush=True)
+    print(f"Frame: {frame}", flush=True)
+    print(f"Cluster: {cluster_id}", flush=True)
     clusters = get_clusters_at_timestep(filename, timestep)
     if cluster_id not in clusters:
-        print(f"Cluster {cluster_id} not found")
+        print(f"Cluster {cluster_id} not found!", flush=True)
         return
     cluster_particles = clusters[cluster_id]
-    print(f"Timestep: {timestep}")
-    print(f"Frame: {frame}")
-    print(f"Cluster: {cluster_id}")
-    print(f"Cluster size: {len(cluster_particles)}")
+    print(f"Cluster size: {len(cluster_particles)}",flush=True)
     ids, positions, box = load_frame(filename,frame=frame)
-    q6 = pyscal_steinhardt(positions,box,averaged=True)
-    id_to_index = {particle_id: i for i, particle_id in enumerate(ids)}
-    for particle_id in cluster_particles:
-        if particle_id not in id_to_index:
-            print(f"WARNING: Particle {particle_id} not found in frame")
-            continue
-        index = id_to_index[particle_id]
-        if np.isnan(q6[index]):
-            print("\n========== NaN PARTICLE ==========")
-            print(f"Particle ID: {particle_id}")
-            print(f"Index: {index}")
-            print(f"Position: {positions[index]}")
-            print(f"Q6: {q6[index]}")
+    average_q6 = calculate_cluster_q6(cluster_particles,ids,positions,box)
+    print(f"\nAverage Q6: {average_q6}",flush=True)
     return
