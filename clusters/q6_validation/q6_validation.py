@@ -9,7 +9,7 @@ import os
 
 
 
-'''final_timestep,final_frame = find_last_timestep(config.dump)
+final_timestep,final_frame = find_last_timestep(config.dump)
 final_clusters = find_largest_clusters(config.dump,final_timestep)
 
 rank = 1
@@ -45,7 +45,7 @@ track_cluster_q6(
     final_cluster_rank=rank,
     interval=10000,
     output_csv=output_csv
-)'''
+)
 
 
-debug_cluster_q6(config.dump,890000,118, 4187)
+#debug_cluster_q6(config.dump,890000,118, 4187)
