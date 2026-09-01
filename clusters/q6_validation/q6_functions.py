@@ -131,6 +131,13 @@ def find_best_cluster_match(tracked_particles, clusters):
     return best_cluster_id, best_overlap, best_score
 
 def calculate_cluster_q6(tracked_particles, ids, positions, box):
+    print(
+        f"Number of tracked particles: {len(tracked_particles)}",
+        flush=True)
+    print(
+        f"Tracked particle IDs: {sorted(tracked_particles)}",
+        flush=True)
+
     q6 = pyscal_steinhardt(positions,box,averaged=True)
     id_to_index = {particle_id: i for i, particle_id in enumerate(ids)}
     tracked_indices = [id_to_index[particle_id]for particle_id in tracked_particles if particle_id in id_to_index]
@@ -148,6 +155,7 @@ def calculate_cluster_q6(tracked_particles, ids, positions, box):
             print(f"Index: {index}", flush=True)
             print(f"Position: {positions[index]}", flush=True)
             print(f"Q6: {q6[index]}", flush=True)
+    
 
     if valid_count == 0:
         print("WARNING: No valid Q6 values for this cluster!", flush=True)
