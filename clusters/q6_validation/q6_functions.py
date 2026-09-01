@@ -131,7 +131,7 @@ def find_best_cluster_match(tracked_particles, clusters):
     return best_cluster_id, best_overlap, best_score
 
 def calculate_cluster_q6(tracked_particles, ids, positions, box):
-    q6 = steinhardt_cutoff(box,positions,average=True)
+    q6 = pyscal_steinhardt(positions,box,averaged=True)
     id_to_index = {particle_id: i for i, particle_id in enumerate(ids)}
     tracked_indices = [id_to_index[particle_id]for particle_id in tracked_particles if particle_id in id_to_index]
 
@@ -139,6 +139,16 @@ def calculate_cluster_q6(tracked_particles, ids, positions, box):
     nan_count = np.isnan(cluster_q6).sum()
     valid_count = np.count_nonzero(~np.isnan(cluster_q6))
     print(f"Cluster particles: {len(cluster_q6)}, "f"NaN Q6 values: {nan_count}", flush=True)
+
+    #temp debugging
+    for particle_id, index in zip(tracked_particles, tracked_indices):
+        if np.isnan(q6[index]):
+            print("\n========== NaN Q6 PARTICLE ==========", flush=True)
+            print(f"Particle ID: {particle_id}", flush=True)
+            print(f"Index: {index}", flush=True)
+            print(f"Position: {positions[index]}", flush=True)
+            print(f"Q6: {q6[index]}", flush=True)
+
     if valid_count == 0:
         print("WARNING: No valid Q6 values for this cluster!", flush=True)
         return np.nan
@@ -237,3 +247,34 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
 
             current_timestep -= interval
             current_frame -= 1
+
+
+
+
+
+
+def debug_cluster_q6(filename, timestep, frame, cluster_id):
+    clusters = get_clusters_at_timestep(filename, timestep)
+    if cluster_id not in clusters:
+        print(f"Cluster {cluster_id} not found")
+        return
+    cluster_particles = clusters[cluster_id]
+    print(f"Timestep: {timestep}")
+    print(f"Frame: {frame}")
+    print(f"Cluster: {cluster_id}")
+    print(f"Cluster size: {len(cluster_particles)}")
+    ids, positions, box = load_frame(filename,frame=frame)
+    q6 = pyscal_steinhardt(positions,box,averaged=True)
+    id_to_index = {particle_id: i for i, particle_id in enumerate(ids)}
+    for particle_id in cluster_particles:
+        if particle_id not in id_to_index:
+            print(f"WARNING: Particle {particle_id} not found in frame")
+            continue
+        index = id_to_index[particle_id]
+        if np.isnan(q6[index]):
+            print("\n========== NaN PARTICLE ==========")
+            print(f"Particle ID: {particle_id}")
+            print(f"Index: {index}")
+            print(f"Position: {positions[index]}")
+            print(f"Q6: {q6[index]}")
+    return
