@@ -11,6 +11,9 @@ def load_frame(filename, frame=0, use_chill=False):
 
     data = pipeline.compute(frame)
 
+    timestep = data.attributes["Timestep"]
+    print(f"Frame {frame} → Timestep {timestep}",flush=True)
+
     ids = np.asarray(data.particles["Particle Identifier"])
     positions = np.asarray(data.particles["Position"])
 
