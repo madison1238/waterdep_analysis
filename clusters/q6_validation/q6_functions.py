@@ -234,10 +234,19 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
 
         tracked_particles = set(final_cluster_particles)
         current_frame = final_frame
+        current_timestep = frame_to_timestep[current_frame]
 
-        _,_,_, current_timestep = load_frame(filename, frame=current_frame)
+        if current_timestep != final_timestep:
+            print(
+                f"WARNING: Final frame/timestep mismatch!\n"
+                f"Expected timestep: {final_timestep}\n"
+                f"Actual timestep: {current_timestep}",
+                flush=True
+            )
+            final_timestep = current_timestep
 
-        while current_timestep >= 0:
+
+        while current_frame >= 0:
             print(
                 f"\nProcessing frame {current_frame}, "
                 f"timestep {current_timestep}",
