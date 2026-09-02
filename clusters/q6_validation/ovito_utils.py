@@ -12,8 +12,7 @@ def load_frame(filename, frame=0, use_chill=False):
     data = pipeline.compute(frame)
 
     timestep = data.attributes["Timestep"]
-    print(f"Frame {frame} → Timestep {timestep}",flush=True)
-
+    #print(f"Frame {frame} → Timestep {timestep}",flush=True)
     ids = np.asarray(data.particles["Particle Identifier"])
     positions = np.asarray(data.particles["Position"])
 
@@ -27,6 +26,6 @@ def load_frame(filename, frame=0, use_chill=False):
 
     if use_chill:
         labels = np.asarray(data.particles["Structure Type"])
-        return ids, positions, box, labels
+        return ids, positions, box, labels, timestep
 
-    return ids, positions, box
+    return ids, positions, box, timestep
