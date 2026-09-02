@@ -31,6 +31,29 @@ def find_last_timestep(filename):
                 for i in range(num_atoms):
                     line = f.readline()
     return final_timestep, final_frame
+
+def build_frame_timestep_map(filename):
+    pipeline = import_file(filename)
+    frame_to_timestep = {}
+    for frame in range(pipeline.source.num_frames):
+        data = pipeline.compute(frame)
+        timestep = data.attributes["Timestep"]
+        frame_to_timestep[frame] = timestep
+        print(
+            f"Frame {frame} -> Timestep {timestep}",
+            flush=True
+        )
+    return frame_to_timestep
+
+def find_previous_frame(current_frame,current_timestep,interval,frame_to_timestep):
+    target_timestep = current_timestep - interval
+    frame = current_frame - 1
+    while frame >= 0:
+        timestep = frame_to_timestep[frame]
+        if timestep <= target_timestep:
+            return frame, timestep
+        frame -= 1
+    return None, None
                 
                 
 
@@ -184,6 +207,12 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
                      final_cluster_particles, final_cluster_size, final_cluster_rank,
                      interval, output_csv):
     print(f"Starting tracking for cluster {final_cluster_id}",flush=True)
+
+
+    print("Building frame to timestep map", flush=True)
+    frame_to_timestep = build_frame_timestep_map(filename)
+    print(f"Found {len(frame_to_timestep)} frames.",flush=True)
+
     
     fieldnames = [
         "final_cluster_rank",
@@ -204,13 +233,18 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
         f.flush()
 
         tracked_particles = set(final_cluster_particles)
-        current_timestep = final_timestep
         current_frame = final_frame
 
-        while current_timestep >= 0:
-            
+        _,_,_, current_timestep = load_frame(filename, frame=current_frame)
 
-            if current_timestep == final_timestep:
+        while current_timestep >= 0:
+            print(
+                f"\nProcessing frame {current_frame}, "
+                f"timestep {current_timestep}",
+                flush=True
+            )
+
+            if current_frame == final_frame:
                 cluster_id = final_cluster_id
                 cluster_size = len(tracked_particles)
                 overlap = np.nan
@@ -225,9 +259,19 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
                 cluster_id = match_id
                 cluster_size = len(tracked_particles)
 
-            ids, positions, box = load_frame(filename, frame=current_frame)
+            ids, positions, box, actual_timestep = load_frame(filename, frame=current_frame)
             average_q6 = calculate_cluster_q6(tracked_particles,ids,positions,box)
             time_ns = current_timestep * 5e-6
+
+            #make sure timesteps and frames are aligning
+            if actual_timestep != current_timestep:
+                print(
+                    f"WARNING: TIMESTEP MISMATCH! "
+                    f"Expected {current_timestep}, "
+                    f"got {actual_timestep}",
+                    flush=True
+                )
+                current_timestep = actual_timestep
 
             writer.writerow({
                 "final_cluster_rank": final_cluster_rank,
@@ -245,6 +289,7 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
 
             print(
                 f"Timestep: {current_timestep}, "
+                f"Frame: {current_frame}, "
                 f"Cluster: {cluster_id}, "
                 f"Size: {cluster_size}, "
                 f"Overlap: {overlap}, "
@@ -253,8 +298,17 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
                 flush=True
             )
 
-            current_timestep -= interval
-            current_frame -= 1
+            next_frame, next_timestep = find_previous_frame(
+                current_frame,
+                current_timestep,
+                interval,
+                frame_to_timestep
+            )
+
+            if next_frame is None:
+                break
+            current_frame = next_frame
+            current_timestep = next_timestep
 
 
 
