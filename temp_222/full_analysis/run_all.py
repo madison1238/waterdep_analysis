@@ -39,7 +39,7 @@ def submit_simulation(sim_number):
 
     sim_directory = f"../sims/sim_{sim_number}"
     command = ["sbatch",f"{sim_directory}/sb.water"]
-    result = subprocess.run(command,capture_output=True,text=True)
+    result = subprocess.run(command,capture_output=True,text=True,cwd=sim_directory)
     if result.returncode == 0:
         log(f"Submitted simulation {sim_number}")
         log(f"    {result.stdout.strip()}")
