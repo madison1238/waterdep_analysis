@@ -37,12 +37,12 @@ def get_my_job_count():
 
 def submit_simulation(sim_number):
 
-    sim_directory = f"../sims/sim_{sim_number}"
+    sim_directory = f"../sims/sim_{sim_number}/q6_validation"
 
     #print(f"Submitting simulation {sim_number}", flush=True)
     #print(f"Directory: {sim_directory}", flush=True)
 
-    command = ["sbatch","sb.water"]
+    command = ["sbatch","sb.validation"]
     result = subprocess.run(command,capture_output=True,text=True,cwd=sim_directory)
     if result.returncode == 0:
         log(f"Submitted simulation {sim_number}")
