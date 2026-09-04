@@ -1,6 +1,7 @@
 import subprocess
 import time
 from datetime import datetime
+import os
 
 
 
@@ -17,16 +18,16 @@ def log(message):
 
 
 def get_my_job_count():
+    username = os.environ["USER"]
     result = subprocess.run(
-        ["squeue", "-u", "$USER", "-h"],
+        ["squeue", "-u", username, "-h"],
         capture_output=True,
         text=True,
-        shell=True
     )
 
     if result.returncode != 0:
-        print("Error checking queue:")
-        print(result.stderr)
+        print("Error checking queue:", flush=True)
+        print(result.stderr, flush=True)
         return None
 
     jobs = result.stdout.strip().splitlines()
