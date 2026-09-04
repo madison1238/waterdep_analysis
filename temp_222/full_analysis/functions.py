@@ -1,4 +1,6 @@
 import csv
+import os
+import shutil
 
 
 def femtoseconds_to_picoseconds(fs, ts):
@@ -97,4 +99,26 @@ def process_simulation(filename, min_n, max_n):
         results[n] = blocks
     return results
 
+
+def copy_to_folder(source_path, destination_folder):
+    os.makedirs(destination_folder,exist_ok=True)
+    if os.path.isfile(source_path):
+        shutil.copy2(source_path, destination_folder)
+
+    elif os.path.isdir(source_path):
+        destination = os.path.join(
+            destination_folder,
+            os.path.basename(source_path)
+        )
+
+        shutil.copytree(
+            source_path,
+            destination,
+            dirs_exist_ok=True
+        )
+
+    else:
+        raise FileNotFoundError(
+            f"Source does not exist: {source_path}"
+        )
 
