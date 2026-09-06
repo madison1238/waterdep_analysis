@@ -99,6 +99,77 @@ def process_simulation(filename, min_n, max_n):
         results[n] = blocks
     return results
 
+def find_excursion_extremes(times,cluster_sizes,n):
+    crossing_indices = []
+
+    for i in range(1,len(cluster_sizes)):
+        previous_size = cluster_sizes[i-1]
+        current_size = cluster_sizes[i]
+
+        crossed_up = previous_size < n and current_size >= n
+        crossed_down = previous_size > n and current_size <= n
+
+        if crossed_up or crossed_down:
+            crossing_indices.append(i)
+
+    excursions = []
+
+    for i in range(1, len(crossing_indices)):
+        start = crossing_indices[i - 1]
+        end = crossing_indices[i]
+        excursion_sizes = cluster_sizes[start:end + 1]
+        maximum = max(excursion_sizes)
+        minimum = min(excursion_sizes)
+        excursions.append((maximum, minimum))
+    return excursions
+
+def calculate_excursion_blocks(excursions):
+    """
+    Group excursion maximum/minimum values into blocks of 4.
+    Block 1 = excursions 1-4
+    Block 2 = excursions 5-8
+    Block 3 = excursions 9-12
+    Block 4 = excursions 13-16
+    """
+
+    block_size = 4
+    blocks = []
+
+    for block_number in range(4):
+
+        start = block_number * block_size
+        end = start + block_size
+
+        block = excursions[start:end]
+
+        if len(block) == block_size:
+
+            max_values = [excursion[0] for excursion in block]
+            min_values = [excursion[1] for excursion in block]
+
+            mean_max = sum(max_values) / block_size
+            mean_min = sum(min_values) / block_size
+
+            blocks.append((mean_max, mean_min))
+
+        else:
+            blocks.append(None)
+
+    return blocks
+
+def process_excursion_simulation(filename, min_n, max_n):
+    times, cluster_sizes = read_simulation(filename)
+    results = {}
+    for n in range(min_n, max_n + 1):
+        excursions = find_excursion_extremes(
+            times,
+            cluster_sizes,
+            n
+        )
+        blocks = calculate_excursion_blocks(excursions)
+        results[n] = blocks
+    return results
+
 
 def copy_to_folder(source_path, destination_folder):
     os.makedirs(destination_folder,exist_ok=True)
