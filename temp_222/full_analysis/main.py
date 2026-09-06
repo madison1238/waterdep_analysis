@@ -5,7 +5,7 @@ import os
 
 
 sims = 300
-sim_files = [f"../sim_{i+1}/summary/ice_clusters.csv" for i in range(sims) ]
+sim_files = [f"../sims/sim_{i+1}/summary/ice_clusters.csv" for i in range(sims) ]
 min_n = 5
 max_n = 60
 timestep_inteveral = 5
