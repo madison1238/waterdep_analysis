@@ -77,7 +77,7 @@ for block in range(4):
         min_y,
         marker=markers[block],
         linestyle=line_styles[block],
-        label=labels[block],
+        #label=labels[block],
         color = colors[block]
     )
 
