@@ -137,7 +137,7 @@ def calculate_cluster_q6(tracked_particles, ids, positions, box):
     cluster_q6 = q6[tracked_indices]
     nan_count = np.isnan(cluster_q6).sum()
     valid_count = np.count_nonzero(~np.isnan(cluster_q6))
-    print(f"Cluster particles: {len(cluster_q6)}, "f"NaN Q6 values: {nan_count}", flush=True)
+    #print(f"Cluster particles: {len(cluster_q6)}, "f"NaN Q6 values: {nan_count}", flush=True)
     if valid_count == 0:
         print("WARNING: No valid Q6 values for this cluster!", flush=True)
         return np.nan
@@ -235,3 +235,26 @@ def track_cluster_q6(filename, final_timestep, final_frame, final_cluster_id,
 
             current_timestep -= interval
             current_frame -= 1
+
+
+def calculate_cluster_steinhardt(tracked_particles, ids, parameter_list):
+    
+    id_to_index = {
+        particle_id: i
+        for i, particle_id in enumerate(ids)
+    }
+
+    tracked_indices = [
+        id_to_index[particle_id]
+        for particle_id in tracked_particles
+        if particle_id in id_to_index
+    ]
+
+    cluster_values = parameter_list[tracked_indices]
+    if len(cluster_values) == 0:
+        return np.nan
+    valid_count = np.count_nonzero(~np.isnan(cluster_values))
+    if valid_count == 0:
+        print("WARNING: No valid Steinhardt values for this cluster!", flush=True)
+        return np.nan
+    return np.nanmean(cluster_values)
