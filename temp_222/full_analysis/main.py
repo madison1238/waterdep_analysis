@@ -81,6 +81,31 @@ for block in range(4):
         color = colors[block]
     )
 
+x_gray = []
+y_gray = []
+
+for n in range(min_n, max_n + 1):
+    block_values = averaged_results[n]
+    all_values = []
+    for value in block_values:
+        if value is not None:
+            average_max, average_min = value
+            all_values.append(average_max)
+            all_values.append(average_min)
+    if len(all_values) > 0:
+        overall_average = sum(all_values) / len(all_values)
+        x_gray.append(n)
+        y_gray.append(overall_average)
+# Plot gray average line
+plt.plot(
+    x_gray,
+    y_gray,
+    color="gray",
+    linestyle="--",
+    linewidth=2,
+    alpha=0.5,
+    label="Average"
+)
 
 plt.xlabel("n")
 plt.ylabel(r'$⟨n{e}⟩$')
