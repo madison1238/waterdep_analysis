@@ -4,20 +4,26 @@ import csv
 import os
 
 
+import functions
+from plot import * 
+import csv
+import os
+
+
 max_n = 40
 min_n = 5
-sim_dirs = 300
-sim_files = [f"../sims/sim_{i+1}/summary/ice_clusters.csv"for i in range(sim_dirs)]
+sim_dirs = 5
+sim_files = [f"../sim_{i+1}/summary/ice_clusters.csv"for i in range(sim_dirs)]
 
 
 all_results = []
 
 for filename in sim_files:
     if not os.path.exists(filename):
-        print(f"File: {filename} not found :(", flush=True)
+        print(f"File: {filename} not found :(")
         continue
     print(f"processing {filename}", flush=True)
-    results = functions.process_excursion_simulation(filename,min_n,max_n)
+    results = functions.process_simulation(filename,min_n,max_n)
     all_results.append(results)
 
 
@@ -25,24 +31,37 @@ averaged_results = {}
 for n in range(min_n, max_n + 1):
     averaged_results[n] = []
     for block in range(4):
-        max_values = []
-        min_values = []
+        values = []
         for sim_results in all_results:
             value = sim_results[n][block]
             if value is not None:
-                average_max, average_min = value
-                max_values.append(average_max)
-                min_values.append(average_min)
-        if len(max_values) > 0:
-            average_max = sum(max_values) / len(max_values)
-            average_min = sum(min_values) / len(min_values)
-            averaged_results[n].append(
-                (average_max, average_min)
-            )
+                values.append(value)
+        if len(values) > 0:
+            average = sum(values) / len(values)
+            averaged_results[n].append(average)
         else:
             averaged_results[n].append(None)
 
 
+
+
+print("\nMean recurrence times:")
+print("n\tBlock 1\tBlock 2\tBlock 3\tBlock 4")
+for n in range(min_n, max_n + 1):
+    values = averaged_results[n]
+    if any(value is not None for value in values):
+
+        print(
+            n,
+            "\t",
+            values[0],
+            "\t",
+            values[1],
+            "\t",
+            values[2],
+            "\t",
+            values[3]
+        )
 
 plt.figure(figsize=(10, 6))
 
@@ -52,63 +71,25 @@ line_styles = ["-", "--", "--", "--"]
 labels = ["Block 1 (1-4)","Block 2 (5-8)","Block 3 (9-12)","Block 4 (13-16)"]
 for block in range(4):
     x = []
-    max_y = []
-    min_y = []
-
+    y = []
     for n in range(min_n, max_n + 1):
         value = averaged_results[n][block]
         if value is not None:
-            average_max, average_min = value
             x.append(n)
-            max_y.append(average_max)
-            min_y.append(average_min)
+            y.append(value)
 
     plt.plot(
         x,
-        max_y,
+        y,
         marker=markers[block],
         linestyle=line_styles[block],
         label=labels[block],
         color = colors[block]
     )
 
-    plt.plot(
-        x,
-        min_y,
-        marker=markers[block],
-        linestyle=line_styles[block],
-        #label=labels[block],
-        color = colors[block]
-    )
-
-x_gray = []
-y_gray = []
-
-for n in range(min_n, max_n + 1):
-    block_values = averaged_results[n]
-    all_values = []
-    for value in block_values:
-        if value is not None:
-            average_max, average_min = value
-            all_values.append(average_max)
-            all_values.append(average_min)
-    if len(all_values) > 0:
-        overall_average = sum(all_values) / len(all_values)
-        x_gray.append(n)
-        y_gray.append(overall_average)
-# Plot gray average line
-plt.plot(
-    x_gray,
-    y_gray,
-    color="gray",
-    linestyle="--",
-    linewidth=2,
-    alpha=0.5,
-    label="Average"
-)
 
 plt.xlabel("n")
-plt.ylabel(r'$⟨n{e}⟩$')
+plt.ylabel("Mean Recurrence Time(ps)")
 plt.legend()
 plt.tight_layout()
-plt.savefig("../summary/blocks_excursion_extremes.png")
+plt.savefig("../summary/blocks.png")
