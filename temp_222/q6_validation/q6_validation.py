@@ -33,15 +33,13 @@ with open(output_file, "w", newline="") as f:
     writer.writerow([
         "frame",
         "timestep",
-        "cluster_id",
-        "cluster_size",
+        "largest_cluster",
         "q6",
         "q4",
         "ih",
         "ic",
         "ice_like",
         "num_clusters",
-        "largest_cluster"
     ])
 
     for frame in range(pipeline.source.num_frames):
@@ -70,30 +68,39 @@ with open(output_file, "w", newline="") as f:
         q4 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=4)
 
         unique_clusters = np.unique(cluster_ids)
+        largest_cluster_id = None
+        largest_size = 0
         for cluster_id in unique_clusters:
             if cluster_id == 0:
                 continue
             cluster_indices = np.where(cluster_ids == cluster_id)[0]
-            cluster_particles = ids[cluster_indices]
-            cluster_size = len(cluster_particles)
-            cluster_q6 = calculate_cluster_steinhardt(cluster_particles,ids,q6)
-            cluster_q4 = calculate_cluster_steinhardt(cluster_particles,ids,q4)
+            cluster_size = len(cluster_indices)
+            if cluster_size > largest_size:
+                largest_size = cluster_size
+                largest_cluster_id = cluster_id
 
-
-
-            writer.writerow([
-                frame,
-                timestep,
-                int(cluster_id),
-                cluster_size,
-                cluster_q6,
-                cluster_q4,
-                ih,
-                ic,
-                ice_like,
-                num_clusters,
-                largest_cluster
-            ])
+        if largest_cluster_id is not None:
+            largest_indices = np.where(cluster_ids == largest_cluster_id)[0]
+            largest_particles = ids[largest_indices]
+            cluster_q6 = calculate_cluster_steinhardt(largest_particles,ids,q6)
+            cluster_q4 = calculate_cluster_steinhardt(largest_particles,ids,q4)
+        else:
+            cluster_q6 = np.nan
+            cluster_q4 = np.nan
+        
+        writer.writerow([
+            frame,
+            timestep,
+            int(cluster_id),
+            cluster_size,
+            cluster_q6,
+            cluster_q4,
+            ih,
+            ic,
+            ice_like,
+            num_clusters,
+            largest_cluster
+        ])
 
         print(
             f"Frame {frame:3d} | "
