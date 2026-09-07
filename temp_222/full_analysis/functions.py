@@ -166,7 +166,12 @@ def process_excursion_simulation(filename, min_n, max_n):
             cluster_sizes,
             n
         )
+        print(f"\nn = {n}")
+        print(f"Number of excursions: {len(excursions)}")
+        print(f"First few excursions: {excursions[:5]}")
+
         blocks = calculate_excursion_blocks(excursions)
+        print(f"Blocks: {blocks}")
         results[n] = blocks
     return results
 
