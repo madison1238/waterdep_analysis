@@ -1,5 +1,7 @@
 from ovito.io import import_file
+from q6_functions import *
 from plots import *
+from pyscal_methods import *
 from ovito.modifiers import (
     ChillPlusModifier,
     ExpressionSelectionModifier,
@@ -9,6 +11,8 @@ import config
 import numpy as np
 import csv
 import os
+import freud
+from ovito_utils import *
 
 
 
@@ -29,6 +33,10 @@ with open(output_file, "w", newline="") as f:
     writer.writerow([
         "frame",
         "timestep",
+        "cluster_id",
+        "cluster_size",
+        "q6",
+        "q4",
         "ih",
         "ic",
         "ice_like",
@@ -47,15 +55,45 @@ with open(output_file, "w", newline="") as f:
         largest_cluster = int(data.attributes.get("ClusterAnalysis.largest_size",0))
         timestep = int(data.attributes["Timestep"])
 
-        writer.writerow([
-            frame,
-            timestep,
-            ih,
-            ic,
-            ice_like,
-            num_clusters,
-            largest_cluster
-        ])
+        ids = np.asarray(data.particles["Particle Identifier"])
+        positions = np.asarray(data.particles["Position"])
+        cluster_ids = np.asarray(data.particles["Cluster"])
+
+        cell = data.cell
+        box = freud.box.Box(
+            Lx=cell[0, 0],
+            Ly=cell[1, 1],
+            Lz=cell[2, 2]
+        )
+
+        q6 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=6)
+        q4 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=4)
+
+        unique_clusters = np.unique(cluster_ids)
+        for cluster_id in unique_clusters:
+            if cluster_id == 0:
+                continue
+            cluster_indices = np.where(cluster_ids == cluster_id)[0]
+            cluster_particles = ids[cluster_indices]
+            cluster_size = len(cluster_particles)
+            cluster_q6 = calculate_cluster_steinhardt(cluster_particles,ids,q6)
+            cluster_q4 = calculate_cluster_steinhardt(cluster_particles,ids,q4)
+
+
+
+            writer.writerow([
+                frame,
+                timestep,
+                int(cluster_id),
+                cluster_size,
+                cluster_q6,
+                cluster_q4,
+                ih,
+                ic,
+                ice_like,
+                num_clusters,
+                largest_cluster
+            ])
 
         print(
             f"Frame {frame:3d} | "
@@ -67,8 +105,6 @@ with open(output_file, "w", newline="") as f:
             f"Largest {largest_cluster:4d}",
             flush=True
         )
-
-plot_largest_vs_time(f"{config.output}/ice_clusters.csv", f"{config.output}/largest_vs_time.png")
 
 
 
