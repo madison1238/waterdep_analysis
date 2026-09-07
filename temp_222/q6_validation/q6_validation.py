@@ -107,7 +107,7 @@ with open(output_file, "w", newline="") as f:
             f"Ic {ic:4d} | "
             f"Ice {ice_like:4d} | "
             f"Clusters {num_clusters:4d} | "
-            f"Largest {largest_cluster:4d}"
+            f"Largest {largest_cluster:4d} | "
             f"Q6 {cluster_q6:.4f} | "
             f"Q4 {cluster_q4:.4f}",
             flush=True
