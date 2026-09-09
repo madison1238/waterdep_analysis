@@ -104,6 +104,23 @@ def calculate_blocks(recurrence_times):
 
     return blocks
 
+
+
+def calculate_blocks_parameters(values):
+    block_size = 4
+    blocks = []
+    for block_number in range(4):
+        start = block_number * block_size
+        end = start + block_size
+        block = values[start:end]
+        # complete blocks of 4
+        if len(block) == block_size:
+            mean = sum(block) / block_size
+            blocks.append(mean)
+        else:
+            blocks.append(None)
+    return blocks
+
 def process_simulation(filename, min_n, max_n):
     """
     Calculate the four recurrence-time blocks
