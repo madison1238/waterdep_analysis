@@ -143,6 +143,9 @@ def process_simulation_parameters(filename, min_n, max_n):
     for every threshold n.
     """
     times, cluster_sizes, q6_values, q4_values = read_simulation(filename)
+    print("Cluster sizes:", len(cluster_sizes))
+    print("Q6 values:", len(q6_values))
+    print("Q4 values:", len(q4_values))
     results = {}
     for n in range(min_n, max_n + 1):
         crossing_indices = find_crossing_indices(cluster_sizes, n)
