@@ -135,6 +135,32 @@ def process_simulation(filename, min_n, max_n):
         results[n] = blocks
     return results
 
+
+def process_simulation_parameters(filename, min_n, max_n):
+
+    """
+    Calculate the four Q6 and Q4 blocks
+    for every threshold n.
+    """
+    times, cluster_sizes, q6_values, q4_values = read_simulation(filename)
+    results = {}
+    for n in range(min_n, max_n + 1):
+        crossing_indices = find_crossing_indices(cluster_sizes, n)
+        crossing_q6 = []
+        crossing_q4 = []
+        for index in crossing_indices:
+            crossing_q6.append(q6_values[index])
+            crossing_q4.append(q4_values[index])
+        q6_blocks = calculate_blocks_parameters(crossing_q6)
+        q4_blocks = calculate_blocks_parameters(crossing_q4)
+        results[n] = {
+            "q6": q6_blocks,
+            "q4": q4_blocks
+        }
+    return results
+
+
+
 def find_excursion_extremes(times,cluster_sizes,n):
     crossing_indices = []
 
