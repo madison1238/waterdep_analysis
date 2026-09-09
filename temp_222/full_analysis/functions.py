@@ -58,6 +58,21 @@ def find_crossings(times, cluster_sizes, n):
             crossing_times.append(times[i])
     return crossing_times
 
+def find_crossing_indices(times, cluster_sizes, n):
+    crossing_indices = []
+    for i in range(1, len(cluster_sizes)):
+        previous_size = cluster_sizes[i - 1]
+        current_size = cluster_sizes[i]
+        # Crossing from below n to above n
+        crossed_up = previous_size < n and current_size >= n
+        # Crossing from above n to below n
+        crossed_down = previous_size > n and current_size <= n
+        if crossed_up or crossed_down:
+            crossing_indices.append([i])
+    return crossing_indices
+
+
+
 def calculate_recurrence_times(crossing_times):
     recurrence_times = []
     for i in range(1, len(crossing_times)):
