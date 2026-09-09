@@ -57,22 +57,29 @@ for n in range(min_n, max_n + 1):
 
 
 
-print("\nMean recurrence times:")
-print("n\tBlock 1\tBlock 2\tBlock 3\tBlock 4")
+print("\nMean Q6 values:")
+print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
 for n in range(min_n, max_n + 1):
-    values = averaged_results[n]
+    values = averaged_q6[n]
     if any(value is not None for value in values):
-
         print(
-            n,
-            "\t",
-            values[0],
-            "\t",
-            values[1],
-            "\t",
-            values[2],
-            "\t",
-            values[3]
+            f"{n}\t"
+            f"{values[0]}\t"
+            f"{values[1]}\t"
+            f"{values[2]}\t"
+            f"{values[3]}"
+        )
+print("\nMean Q4 values:")
+print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
+for n in range(min_n, max_n + 1):
+    values = averaged_q4[n]
+    if any(value is not None for value in values):
+        print(
+            f"{n}\t"
+            f"{values[0]}\t"
+            f"{values[1]}\t"
+            f"{values[2]}\t"
+            f"{values[3]}"
         )
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 6))
