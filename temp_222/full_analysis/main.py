@@ -23,7 +23,7 @@ for filename in sim_files:
         print(f"File: {filename} not found :(")
         continue
     print(f"processing {filename}", flush=True)
-    results = functions.process_simulation(filename,min_n,max_n)
+    results = functions.process_simulation_parameters(filename,min_n,max_n)
     all_results.append(results)
 
 
