@@ -28,15 +28,19 @@ def get_first_passage_times(filename, min_n, max_n):
 def read_simulation(filename):
     times = []
     largest_clusters = []
+    q6_values = []
+    q4_values = []
     with open(filename, "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
             timestep = int(row["timestep"])
             largest_cluster = int(row["largest_cluster"])
+            q6 = float(row["q6"])
+            q4 = float(row["q4"])
             time_ps = femtoseconds_to_picoseconds(timestep, 5)
             times.append(time_ps)
             largest_clusters.append(largest_cluster)
-    return times, largest_clusters
+    return times, largest_clusters, q6_values, q4_values
 
 
 #find times at which largest cluster reaches threshold
