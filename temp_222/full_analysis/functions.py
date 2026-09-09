@@ -68,7 +68,7 @@ def find_crossing_indices(cluster_sizes, n):
         # Crossing from above n to below n
         crossed_down = previous_size > n and current_size <= n
         if crossed_up or crossed_down:
-            crossing_indices.append([i])
+            crossing_indices.append(i)
     return crossing_indices
 
 
