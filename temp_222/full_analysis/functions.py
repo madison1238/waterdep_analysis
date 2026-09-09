@@ -58,7 +58,7 @@ def find_crossings(times, cluster_sizes, n):
             crossing_times.append(times[i])
     return crossing_times
 
-def find_crossing_indices(times, cluster_sizes, n):
+def find_crossing_indices(cluster_sizes, n):
     crossing_indices = []
     for i in range(1, len(cluster_sizes)):
         previous_size = cluster_sizes[i - 1]
