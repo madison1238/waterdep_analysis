@@ -75,22 +75,25 @@ for n in range(min_n, max_n + 1):
             values[3]
         )
 
-plt.figure(figsize=(10, 6))
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+ax = axes[0]
 
 colors = ['blue', 'green', 'yellow', 'red']
 markers = ["o", "s", "^", "D"]
 line_styles = ["-", "--", "--", "--"]
 labels = ["Block 1 (1-4)","Block 2 (5-8)","Block 3 (9-12)","Block 4 (13-16)"]
+
+
 for block in range(4):
     x = []
     y = []
     for n in range(min_n, max_n + 1):
-        value = averaged_results[n][block]
+        value = averaged_q6[n][block]
         if value is not None:
             x.append(n)
             y.append(value)
 
-    plt.plot(
+    ax.plot(
         x,
         y,
         marker=markers[block],
@@ -100,8 +103,40 @@ for block in range(4):
     )
 
 
-plt.xlabel("n")
-plt.ylabel("Mean Recurrence Time(ps)")
-plt.legend()
+ax.set_xlabel("n")
+ax.set_ylabel("Q6")
+ax.set_title("(a)")
+
+ax = axes[1]
+
+for block in range(4):
+    x = []
+    y = []
+    for n in range(min_n, max_n + 1):
+        value = averaged_q4[n][block]
+        if value is not None:
+            x.append(n)
+            y.append(value)
+    ax.plot(
+        x, 
+        y,
+        marker=markers[block],
+        linestyle=line_styles[block],
+        color=colors[block],
+        label=labels[block]
+    )
+
+ax.set_xlabel("n")
+ax.set_ylabel("Q4")
+ax.set_title("(b)")
+
+handles, labels_legend = axes[0].get_legend_handles_labels()
+
+fig.legend(
+    handles,
+    labels_legend,
+    loc="lower center",
+    ncol=4
+)
 plt.tight_layout()
-plt.savefig("../summary/blocks.png")
+plt.savefig("../summary/q6_q4_blocks.png", dpi=300)
