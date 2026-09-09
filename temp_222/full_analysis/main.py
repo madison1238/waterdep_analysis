@@ -12,8 +12,8 @@ import os
 
 max_n = 40
 min_n = 5
-sim_dirs = 5
-sim_files = [f"../sim_{i+1}/summary/ice_clusters.csv"for i in range(sim_dirs)]
+sim_dirs = 300
+sim_files = [f"../sims/sim_{i+1}/summary/ice_clusters.csv"for i in range(sim_dirs)]
 
 
 all_results = []
