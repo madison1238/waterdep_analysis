@@ -40,6 +40,8 @@ def read_simulation(filename):
             time_ps = femtoseconds_to_picoseconds(timestep, 5)
             times.append(time_ps)
             largest_clusters.append(largest_cluster)
+            q6_values.append(q6)
+            q4_values.append(q4)
     return times, largest_clusters, q6_values, q4_values
 
 
