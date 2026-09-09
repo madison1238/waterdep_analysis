@@ -27,20 +27,32 @@ for filename in sim_files:
     all_results.append(results)
 
 
-averaged_results = {}
+averaged_q6 = {}
+averaged_q4 = {}
 for n in range(min_n, max_n + 1):
-    averaged_results[n] = []
+    averaged_q6[n] = []
+    averaged_q4[n] = []
     for block in range(4):
-        values = []
+        q6_values = []
+        q4_values = []
         for sim_results in all_results:
-            value = sim_results[n][block]
-            if value is not None:
-                values.append(value)
-        if len(values) > 0:
-            average = sum(values) / len(values)
-            averaged_results[n].append(average)
+            q6_value = sim_results[n]["q6"][block]
+            q4_value = sim_results[n]["q4"][block]
+            if q6_value is not None:
+                q6_values.append(q6_value)
+            if q4_value is not None:
+                q4_values.append(q4_value)
+
+        if len(q6_values) > 0:
+            average_q6 = sum(q6_values) / len(q6_values)
+            averaged_q6[n].append(average_q6)
         else:
-            averaged_results[n].append(None)
+            averaged_q6[n].append(None)
+        if len(q4_values) > 0:
+            average_q4 = sum(q4_values) / len(q4_values)
+            averaged_q4[n].append(average_q4)
+        else:
+            averaged_q4[n].append(None)
 
 
 
