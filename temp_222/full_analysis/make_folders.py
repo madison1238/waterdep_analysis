@@ -10,7 +10,7 @@ for i in range(sims):
     os.makedirs(sim_dir, exist_ok=True)
     seed1 = all_seed1[i]
     seed2 = all_seed2[i]
-    shutil.copytree('./base', sim_dir, dirs_exist_ok=True)
+    shutil.copytree('../base', sim_dir, dirs_exist_ok=True)
 
     slurm_file = f"{sim_dir}/sb.water"
     lammps_file = f"{sim_dir}/in.template"
