@@ -3,147 +3,58 @@ from plot import *
 import csv
 import os
 
-
-import functions
-from plot import * 
-import csv
-import os
-
-
-max_n = 40
+sims = 300
+sim_files = [f"../sim/sim_{i+1}/summary/ice_clusters.csv" for i in range(sims) ]
 min_n = 5
-sim_dirs = 300
-sim_files = [f"../sims/sim_{i+1}/summary/ice_clusters.csv"for i in range(sim_dirs)]
+max_n = 60
+timestep_inteveral = 5
 
+all_first_passages = []
+for file_name in sim_files:
+    print(f"Processing {file_name}")
+    first_passage = functions.get_first_passage_times(file_name, min_n,max_n)
+    all_first_passages.append(first_passage)
 
-all_results = []
+mfpt = {}
+for n in range(min_n, max_n+1):
+    times = []
+    for sim in all_first_passages:
+        timestep = sim[n]
+        if timestep is not None:
+            times.append(timestep)
+    if len(times) > 0:
+        mean_timestep = sum(times) / len(times)
+        mean_ps = mean_timestep * timestep_inteveral * 1e-3
+        mfpt[n] = mean_ps
 
-for filename in sim_files:
-    if not os.path.exists(filename):
-        print(f"File: {filename} not found :(")
-        continue
-    print(f"processing {filename}", flush=True)
-    results = functions.process_simulation_parameters(filename,min_n,max_n)
-    all_results.append(results)
+    else:
+        mfpt[n] = None
 
+output_folder = '../summary'
+os.makedirs(output_folder,exist_ok=True)
+with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
+    writer = csv.writer(file)
 
-averaged_q6 = {}
-averaged_q4 = {}
-for n in range(min_n, max_n + 1):
-    averaged_q6[n] = []
-    averaged_q4[n] = []
-    for block in range(4):
-        q6_values = []
-        q4_values = []
-        for sim_results in all_results:
-            q6_value = sim_results[n]["q6"][block]
-            q4_value = sim_results[n]["q4"][block]
-            if q6_value is not None:
-                q6_values.append(q6_value)
-            if q4_value is not None:
-                q4_values.append(q4_value)
+    writer.writerow([
+        "n",
+        "sim1_ps",
+        "sim2_ps",
+        "sim3_ps",
+        "sim4_ps",
+        "sim5_ps",
+        "MFPT_ps"
+    ])
 
-        if len(q6_values) > 0:
-            average_q6 = sum(q6_values) / len(q6_values)
-            averaged_q6[n].append(average_q6)
-        else:
-            averaged_q6[n].append(None)
-        if len(q4_values) > 0:
-            average_q4 = sum(q4_values) / len(q4_values)
-            averaged_q4[n].append(average_q4)
-        else:
-            averaged_q4[n].append(None)
+    for n in range(min_n,max_n+1):
+        row = [n]
+        for sim in all_first_passages:
+            timestep = sim[n]
+            if timestep is not None:
+                time_ps = timestep * timestep_inteveral * 1e-3
+                row.append(time_ps)
+            else:
+                row.append("")
+        row.append(mfpt[n])
+        writer.writerow(row)
 
-
-
-
-print("\nMean Q6 values:")
-print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
-for n in range(min_n, max_n + 1):
-    values = averaged_q6[n]
-    if any(value is not None for value in values):
-        print(
-            f"{n}\t"
-            f"{values[0]}\t"
-            f"{values[1]}\t"
-            f"{values[2]}\t"
-            f"{values[3]}"
-        )
-print("\nMean Q4 values:")
-print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
-for n in range(min_n, max_n + 1):
-    values = averaged_q4[n]
-    if any(value is not None for value in values):
-        print(
-            f"{n}\t"
-            f"{values[0]}\t"
-            f"{values[1]}\t"
-            f"{values[2]}\t"
-            f"{values[3]}"
-        )
-
-fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-ax = axes[0]
-
-colors = ['blue', 'green', 'yellow', 'red']
-markers = ["o", "s", "^", "D"]
-line_styles = ["-", "--", "--", "--"]
-labels = ["Block 1 (1-4)","Block 2 (5-8)","Block 3 (9-12)","Block 4 (13-16)"]
-
-
-for block in range(4):
-    x = []
-    y = []
-    for n in range(min_n, max_n + 1):
-        value = averaged_q6[n][block]
-        if value is not None:
-            x.append(n)
-            y.append(value)
-
-    ax.plot(
-        x,
-        y,
-        marker=markers[block],
-        linestyle=line_styles[block],
-        label=labels[block],
-        color = colors[block]
-    )
-
-
-ax.set_xlabel("n")
-ax.set_ylabel("Q6")
-ax.set_title("(a)")
-
-ax = axes[1]
-
-for block in range(4):
-    x = []
-    y = []
-    for n in range(min_n, max_n + 1):
-        value = averaged_q4[n][block]
-        if value is not None:
-            x.append(n)
-            y.append(value)
-    ax.plot(
-        x, 
-        y,
-        marker=markers[block],
-        linestyle=line_styles[block],
-        color=colors[block],
-        label=labels[block]
-    )
-
-ax.set_xlabel("n")
-ax.set_ylabel("Q4")
-ax.set_title("(b)")
-
-handles, labels_legend = axes[0].get_legend_handles_labels()
-
-fig.legend(
-    handles,
-    labels_legend,
-    loc="lower center",
-    ncol=4
-)
-plt.tight_layout()
-plt.savefig("../summary/q6_q4_blocks.png", dpi=300)
+plot_MFPT_v_n(f"../summary/MFPT_vs_n.png")
