@@ -5,7 +5,8 @@ from pyscal_methods import *
 from ovito.modifiers import (
     ChillPlusModifier,
     ExpressionSelectionModifier,
-    ClusterAnalysisModifier
+    ClusterAnalysisModifier,
+    VoronoiAnalysisModifier
 )
 import config
 import numpy as np
@@ -23,6 +24,8 @@ print("Frames:", pipeline.source.num_frames, flush=True)
 pipeline.modifiers.append(ChillPlusModifier())
 pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
 pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True))
+pipeline.modifiers.append(VoronoiAnalysisModifier())
+
 
 os.makedirs(config.output, exist_ok=True)
 output_file = f"{config.output}/ice_clusters.csv"
@@ -40,10 +43,13 @@ with open(output_file, "w", newline="") as f:
         "ic",
         "ice_like",
         "num_clusters",
+        "mean_cn",
+        "std_cn",
     ])
 
     for frame in range(pipeline.source.num_frames):
         data = pipeline.compute(frame)
+        coordination = np.sum(np.asarray(data.particles["Voronoi Index"]),axis=1)
         structure_types = np.asarray(data.particles["Structure Type"])
         ih = np.sum(structure_types == 1)
         ic = np.sum(structure_types == 2)
@@ -82,11 +88,18 @@ with open(output_file, "w", newline="") as f:
         if largest_cluster_id is not None:
             largest_indices = np.where(cluster_ids == largest_cluster_id)[0]
             largest_particles = ids[largest_indices]
+
+            cluster_cn = coordination[largest_indices]
+            mean_cn = np.mean(cluster_cn)
+            std_cn = np.std(cluster_cn)
+
             cluster_q6 = calculate_cluster_steinhardt(largest_particles,ids,q6)
             cluster_q4 = calculate_cluster_steinhardt(largest_particles,ids,q4)
         else:
             cluster_q6 = np.nan
             cluster_q4 = np.nan
+            mean_cn = np.nan
+            std_cn = np.nan
         
         writer.writerow([
             frame,
@@ -98,6 +111,8 @@ with open(output_file, "w", newline="") as f:
             ic,
             ice_like,
             num_clusters,
+            mean_cn,
+            std_cn,
         ])
 
         print(
