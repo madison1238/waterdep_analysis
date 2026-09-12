@@ -124,7 +124,9 @@ with open(output_file, "w", newline="") as f:
             f"Clusters {num_clusters:4d} | "
             f"Largest {largest_cluster:4d} | "
             f"Q6 {cluster_q6:.4f} | "
-            f"Q4 {cluster_q4:.4f}",
+            f"Q4 {cluster_q4:.4f} | ",
+            f"Mean Coordination Number {mean_cn:.4f} | ",
+            f"STD Coordination Number {std_cn:.4f} | ",
             flush=True
         )
 
