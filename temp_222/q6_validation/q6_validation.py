@@ -20,12 +20,11 @@ from ovito_utils import *
 
 pipeline = import_file(config.dump)
 print("Frames:", pipeline.source.num_frames, flush=True)
-
 pipeline.modifiers.append(ChillPlusModifier())
 pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
 pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True))
-pipeline.modifiers.append(VoronoiAnalysisModifier())
-
+voro = VoronoiAnalysisModifier(compute_indices=True)
+pipeline.modifiers.append(voro)
 
 os.makedirs(config.output, exist_ok=True)
 output_file = f"{config.output}/ice_clusters.csv"
@@ -49,7 +48,8 @@ with open(output_file, "w", newline="") as f:
 
     for frame in range(pipeline.source.num_frames):
         data = pipeline.compute(frame)
-        coordination = np.sum(np.asarray(data.particles["Voronoi Index"]),axis=1)
+        voro_indices = np.asarray(data.particles["Voronoi Index"])
+        coordination = np.sum(voro_indices, axis=1)
         structure_types = np.asarray(data.particles["Structure Type"])
         ih = np.sum(structure_types == 1)
         ic = np.sum(structure_types == 2)
