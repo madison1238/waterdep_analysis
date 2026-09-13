@@ -176,7 +176,7 @@ def process_simulation_parameters(filename, min_n, max_n):
         results[n] = {
             "q6": q6_blocks,
             "q4": q4_blocks,
-            "tetra": tetra_blocks,
+            "tetrahedrality": tetra_blocks,
             "coordination": coord_blocks
 
         }
