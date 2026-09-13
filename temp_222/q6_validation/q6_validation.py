@@ -105,6 +105,7 @@ with open(output_file, "w", newline="") as f:
             cluster_q4 = np.nan
             mean_cn = np.nan
             std_cn = np.nan
+            mean_tetrahedrality = np.nan
         
         writer.writerow([
             frame,
