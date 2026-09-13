@@ -44,6 +44,7 @@ with open(output_file, "w", newline="") as f:
         "num_clusters",
         "mean_cn",
         "std_cn",
+        "mean_tetrahedrality"
     ])
 
     for frame in range(pipeline.source.num_frames):
@@ -72,6 +73,7 @@ with open(output_file, "w", newline="") as f:
 
         q6 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=6)
         q4 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=4)
+        tetrahedrality = pyscal_tetrahedrality(positions,box, method='cutoff',cutoff=3.5)
 
         unique_clusters = np.unique(cluster_ids)
         largest_cluster_id = None
@@ -93,6 +95,9 @@ with open(output_file, "w", newline="") as f:
             mean_cn = np.mean(cluster_cn)
             std_cn = np.std(cluster_cn)
 
+            cluster_tetrahedrality = tetrahedrality[largest_indices]
+            mean_tetrahedrality = np.mean(cluster_tetrahedrality)
+
             cluster_q6 = calculate_cluster_steinhardt(largest_particles,ids,q6)
             cluster_q4 = calculate_cluster_steinhardt(largest_particles,ids,q4)
         else:
@@ -113,6 +118,7 @@ with open(output_file, "w", newline="") as f:
             num_clusters,
             mean_cn,
             std_cn,
+            mean_tetrahedrality,
         ])
 
         print(
@@ -127,6 +133,7 @@ with open(output_file, "w", newline="") as f:
             f"Q4 {cluster_q4:.4f} | ",
             f"Mean Coordination Number {mean_cn:.4f} | ",
             f"STD Coordination Number {std_cn:.4f} | ",
+            f"Mean Tetrahedrality Number {mean_cn:.4f} | ",
             flush=True
         )
 
