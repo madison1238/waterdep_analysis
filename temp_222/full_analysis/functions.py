@@ -30,6 +30,8 @@ def read_simulation(filename):
     largest_clusters = []
     q6_values = []
     q4_values = []
+    tetra_values = []
+    coord_values = []
     with open(filename, "r") as file:
         reader = csv.DictReader(file)
         for row in reader:
@@ -37,12 +39,16 @@ def read_simulation(filename):
             largest_cluster = int(row["largest_cluster"])
             q6 = float(row["q6"])
             q4 = float(row["q4"])
+            tetra = float(row["mean_tetrahedrality"])
+            coord = float(row["mean_cn"])
             time_ps = femtoseconds_to_picoseconds(timestep, 5)
             times.append(time_ps)
             largest_clusters.append(largest_cluster)
             q6_values.append(q6)
             q4_values.append(q4)
-    return times, largest_clusters, q6_values, q4_values
+            tetra_values.append(tetra)
+            coord_values.append(coord)
+    return times, largest_clusters, q6_values, q4_values, tetra_values, coord_values
 
 
 #find times at which largest cluster reaches threshold
@@ -144,23 +150,35 @@ def process_simulation_parameters(filename, min_n, max_n):
     Calculate the four Q6 and Q4 blocks
     for every threshold n.
     """
-    times, cluster_sizes, q6_values, q4_values = read_simulation(filename)
+    times, cluster_sizes, q6_values, q4_values,tetra_values,coord_values = read_simulation(filename)
     print("Cluster sizes:", len(cluster_sizes))
     print("Q6 values:", len(q6_values))
     print("Q4 values:", len(q4_values))
+    print("Tetrahedrality Values:", len(tetra_values))
+    print("Coordination Numbers:", len(coord_values))
     results = {}
     for n in range(min_n, max_n + 1):
         crossing_indices = find_crossing_indices(cluster_sizes, n)
         crossing_q6 = []
         crossing_q4 = []
+        crossing_tetra = []
+        crossing_coord = []
         for index in crossing_indices:
             crossing_q6.append(q6_values[index])
             crossing_q4.append(q4_values[index])
+            crossing_tetra.append(tetra_values[index])
+            crossing_coord.append(coord_values[index])
         q6_blocks = calculate_blocks_parameters(crossing_q6)
         q4_blocks = calculate_blocks_parameters(crossing_q4)
+        tetra_blocks = calculate_blocks_parameters(crossing_tetra)
+        coord_blocks = calculate_blocks_parameters(crossing_coord)
+
         results[n] = {
             "q6": q6_blocks,
-            "q4": q4_blocks
+            "q4": q4_blocks,
+            "tetra": tetra_blocks,
+            "coordination": coord_blocks
+
         }
     return results
 
