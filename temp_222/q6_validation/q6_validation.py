@@ -133,7 +133,7 @@ with open(output_file, "w", newline="") as f:
             f"Q4 {cluster_q4:.4f} | ",
             f"Mean Coordination Number {mean_cn:.4f} | ",
             f"STD Coordination Number {std_cn:.4f} | ",
-            f"Mean Tetrahedrality Number {mean_cn:.4f} | ",
+            f"Mean Tetrahedrality Number {mean_tetrahedrality:.4f} | ",
             flush=True
         )
 
