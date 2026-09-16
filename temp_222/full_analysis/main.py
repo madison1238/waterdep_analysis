@@ -3,6 +3,7 @@ from plot import *
 import csv
 import os
 
+
 max_n = 40
 min_n = 5
 sim_dirs = 300
@@ -16,156 +17,62 @@ for filename in sim_files:
         print(f"File: {filename} not found :(")
         continue
     print(f"processing {filename}", flush=True)
-    results = functions.process_simulation_parameters(filename,min_n,max_n)
+    results = functions.process_simulation(filename,min_n,max_n)
     all_results.append(results)
 
 
-averaged_q6 = {}
-averaged_q4 = {}
-averaged_tetrahedrality = {}
-averaged_coordination = {}
+averaged_results = {}
 for n in range(min_n, max_n + 1):
-    averaged_q6[n] = []
-    averaged_q4[n] = []
-    averaged_tetrahedrality[n] = []
-    averaged_coordination[n] = []
+    averaged_results[n] = []
     for block in range(4):
-        q6_values = []
-        q4_values = []
-        tetra_values = []
-        coordination_values = []
+        values = []
         for sim_results in all_results:
-            q6_value = sim_results[n]["q6"][block]
-            q4_value = sim_results[n]["q4"][block]
-            tetra_value = sim_results[n]["tetrahedrality"][block]
-            coordination_value = sim_results[n]["coordination"][block]
-            if q6_value is not None:
-                q6_values.append(q6_value)
-            if q4_value is not None:
-                q4_values.append(q4_value)
-            if tetra_value is not None:
-                tetra_values.append(tetra_value)
-            if coordination_value is not None:
-                coordination_values.append(coordination_value)
-
-
-        # Q6
-        if len(q6_values) > 0:
-            average_q6 = sum(q6_values) / len(q6_values)
-            averaged_q6[n].append(average_q6)
+            value = sim_results[n][block]
+            if value is not None:
+                values.append(value)
+        if len(values) > 0:
+            average = sum(values) / len(values)
+            averaged_results[n].append(average)
         else:
-            averaged_q6[n].append(None)
-        #Q4
-        if len(q4_values) > 0:
-            average_q4 = sum(q4_values) / len(q4_values)
-            averaged_q4[n].append(average_q4)
-        else:
-            averaged_q4[n].append(None)
-
-        # Tetrahedrality
-        if len(tetra_values) > 0:
-            average_tetra = sum(tetra_values) / len(tetra_values)
-            averaged_tetrahedrality[n].append(average_tetra)
-        else:
-            averaged_tetrahedrality[n].append(None)
+            averaged_results[n].append(None)
 
 
-        # Coordination number
-        if len(coordination_values) > 0:
-            average_coordination = (
-                sum(coordination_values) / len(coordination_values)
-            )
-            averaged_coordination[n].append(average_coordination)
-        else:
-            averaged_coordination[n].append(None)
 
 
-#PRINT STATEMENTS
-
-print("\nMean Q6 values:")
-print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
+print("\nMean recurrence times:")
+print("n\tBlock 1\tBlock 2\tBlock 3\tBlock 4")
 for n in range(min_n, max_n + 1):
-    values = averaged_q6[n]
+    values = averaged_results[n]
     if any(value is not None for value in values):
+
         print(
-            f"{n}\t"
-            f"{values[0]}\t"
-            f"{values[1]}\t"
-            f"{values[2]}\t"
-            f"{values[3]}"
-        )
-print("\nMean Q4 values:")
-print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
-for n in range(min_n, max_n + 1):
-    values = averaged_q4[n]
-    if any(value is not None for value in values):
-        print(
-            f"{n}\t"
-            f"{values[0]}\t"
-            f"{values[1]}\t"
-            f"{values[2]}\t"
-            f"{values[3]}"
+            n,
+            "\t",
+            values[0],
+            "\t",
+            values[1],
+            "\t",
+            values[2],
+            "\t",
+            values[3]
         )
 
+plt.figure(figsize=(7, 7))
 
-print("\nMean tetrahedrality values:")
-print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
-
-for n in range(min_n, max_n + 1):
-
-    values = averaged_tetrahedrality[n]
-
-    if any(value is not None for value in values):
-        print(
-            f"{n}\t"
-            f"{values[0]}\t"
-            f"{values[1]}\t"
-            f"{values[2]}\t"
-            f"{values[3]}"
-        )
-
-
-print("\nMean coordination number values:")
-print("n\tBlock 1\t\tBlock 2\t\tBlock 3\t\tBlock 4")
-
-for n in range(min_n, max_n + 1):
-
-    values = averaged_coordination[n]
-
-    if any(value is not None for value in values):
-        print(
-            f"{n}\t"
-            f"{values[0]}\t"
-            f"{values[1]}\t"
-            f"{values[2]}\t"
-            f"{values[3]}"
-        )
-
-#PLOTTING
-
-
-fig, axes = plt.subplots(2, 2, figsize=(14, 12))
 colors = ['blue', 'green', 'yellow', 'red']
 markers = ["o", "s", "^", "D"]
 line_styles = ["-", "--", "--", "--"]
 labels = ["Block 1 (1-4)","Block 2 (5-8)","Block 3 (9-12)","Block 4 (13-16)"]
-
-
-
-
-#Q6
-ax = axes[0,0]
-
 for block in range(4):
     x = []
     y = []
     for n in range(min_n, max_n + 1):
-        value = averaged_q6[n][block]
+        value = averaged_results[n][block]
         if value is not None:
             x.append(n)
             y.append(value)
 
-    ax.plot(
+    plt.plot(
         x,
         y,
         marker=markers[block],
@@ -175,95 +82,8 @@ for block in range(4):
     )
 
 
-ax.set_xlabel("n")
-ax.set_ylabel("Q6")
-ax.set_title("(a)")
-
-
-#Q4
-
-ax = axes[0,1]
-
-for block in range(4):
-    x = []
-    y = []
-    for n in range(min_n, max_n + 1):
-        value = averaged_q4[n][block]
-        if value is not None:
-            x.append(n)
-            y.append(value)
-    ax.plot(
-        x, 
-        y,
-        marker=markers[block],
-        linestyle=line_styles[block],
-        color=colors[block],
-        label=labels[block]
-    )
-
-ax.set_xlabel("n")
-ax.set_ylabel("Q4")
-ax.set_title("(b)")
-
-#Tetra
-ax = axes[1, 0]
-
-for block in range(4):
-
-    x = []
-    y = []
-
-    for n in range(min_n, max_n + 1):
-        value = averaged_tetrahedrality[n][block]
-        if value is not None:
-            x.append(n)
-            y.append(value)
-    ax.plot(
-        x,
-        y,
-        marker=markers[block],
-        linestyle=line_styles[block],
-        color=colors[block],
-        label=labels[block]
-    )
-ax.set_xlabel("n")
-ax.set_ylabel("Tetrahedrality")
-ax.set_title("(c)")
-
-
-#CN
-ax = axes[1, 1]
-
-for block in range(4):
-    x = []
-    y = []
-    for n in range(min_n, max_n + 1):
-        value = averaged_coordination[n][block]
-        if value is not None:
-            x.append(n)
-            y.append(value)
-    ax.plot(
-        x,
-        y,
-        marker=markers[block],
-        linestyle=line_styles[block],
-        color=colors[block],
-        label=labels[block]
-    )
-ax.set_xlabel("n")
-ax.set_ylabel("Coordination Number")
-ax.set_title("(d)")
-
-
-
-handles, labels_legend = axes[0,0].get_legend_handles_labels()
-
-fig.legend(
-    handles,
-    labels_legend,
-    loc="lower center",
-    ncol=4
-)
-plt.tight_layout(rect=[0, 0.05, 1, 1])
-
-plt.savefig("../summary/q6_q4_tetra_coord_blocks.png", dpi=300)
+plt.xlabel("n")
+plt.ylabel("Mean Recurrence Time(ps)")
+plt.legend()
+plt.tight_layout()
+plt.savefig("../summary/blocks.png")
