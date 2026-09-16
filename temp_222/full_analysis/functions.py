@@ -23,6 +23,21 @@ def get_first_passage_times(filename, min_n, max_n):
                     first_passage[n] = timestep
     return first_passage
 
+def get_MFPT(filename, min_n, max_n):
+    results = {}
+    with open(filename, "r", newline="") as file:
+        reader = csv.DictReader(file)
+        times = []
+        cluster_sizes = []
+        for row in reader:
+            times.append(int(row["timestep"]))
+            cluster_sizes.append(int(row["largest_cluster"]))
+    for n in range(min_n, max_n + 1):
+        crossing_times = find_crossings(times, cluster_sizes, n)
+        recurrence_times = calculate_recurrence_times(crossing_times)
+        blocks = calculate_blocks(recurrence_times)
+        results[n] = blocks
+    return results
 
 # read csv to get times and largest clusters
 def read_simulation(filename):
