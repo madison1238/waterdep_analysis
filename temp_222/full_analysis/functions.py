@@ -134,7 +134,7 @@ def process_simulation(filename, min_n, max_n):
     Calculate the four recurrence-time blocks
     for every threshold n.
     """
-    times, cluster_sizes = read_simulation(filename)
+    times, cluster_sizes, q6_values, q4_values, tetra_values, coord_values = read_simulation(filename)
     results = {}
     for n in range(min_n, max_n + 1):
         crossings = find_crossings(times,cluster_sizes,n)
@@ -150,7 +150,7 @@ def process_simulation_parameters(filename, min_n, max_n):
     Calculate the four Q6 and Q4 blocks
     for every threshold n.
     """
-    times, cluster_sizes, q6_values, q4_values,tetra_values,coord_values = read_simulation(filename)
+    times, cluster_sizes, q6_values, q4_values, tetra_values, coord_values = read_simulation(filename)
     print("Cluster sizes:", len(cluster_sizes))
     print("Q6 values:", len(q6_values))
     print("Q4 values:", len(q4_values))
@@ -243,7 +243,7 @@ def calculate_excursion_blocks(excursions):
     return blocks
 
 def process_excursion_simulation(filename, min_n, max_n):
-    times, cluster_sizes = read_simulation(filename)
+    times, cluster_sizes, q6_values, q4_values, tetra_values, coord_values = read_simulation(filename)
     results = {}
     for n in range(min_n, max_n + 1):
         excursions = find_excursion_extremes(
