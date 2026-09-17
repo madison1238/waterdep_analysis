@@ -52,18 +52,6 @@ with open(output_file, "w", newline="") as f:
         voro_indices = np.asarray(data.particles["Voronoi Index"])
         coordination = np.sum(voro_indices, axis=1)
 
-        
-        print("\nFRAME:", frame, flush=True)
-        print("Voronoi index shape:", voro_indices.shape, flush=True)
-
-        for i in range(min(10, len(voro_indices))):
-            print(
-                "Particle:", ids[i] if "ids" in locals() else i,
-                "Voronoi Index:", voro_indices[i],
-                "CN:", coordination[i]
-                , flush=True
-            )
-
         structure_types = np.asarray(data.particles["Structure Type"])
         ih = np.sum(structure_types == 1)
         ic = np.sum(structure_types == 2)
@@ -77,6 +65,16 @@ with open(output_file, "w", newline="") as f:
         positions = np.asarray(data.particles["Position"])
         cluster_ids = np.asarray(data.particles["Cluster"])
 
+
+
+        coordination_ovito = np.asarray(data.particles["Coordination"])
+        coordination_index = np.sum(voro_indices, axis=1)
+        print("Index-derived CN:", coordination_index[:10])
+        print("OVITO CN:", coordination_ovito[:10])
+        print(
+            "Maximum difference:",
+            np.max(np.abs(coordination_index - coordination_ovito)))
+        
         cell = data.cell
         box = freud.box.Box(
             Lx=cell[0, 0],
