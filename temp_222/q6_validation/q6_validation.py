@@ -49,8 +49,7 @@ with open(output_file, "w", newline="") as f:
 
     for frame in range(pipeline.source.num_frames):
         data = pipeline.compute(frame)
-        voro_indices = np.asarray(data.particles["Voronoi Index"])
-        coordination = np.sum(voro_indices, axis=1)
+        coordination = np.asarray(data.particles["Coordination"])
 
         structure_types = np.asarray(data.particles["Structure Type"])
         ih = np.sum(structure_types == 1)
@@ -64,16 +63,6 @@ with open(output_file, "w", newline="") as f:
         ids = np.asarray(data.particles["Particle Identifier"])
         positions = np.asarray(data.particles["Position"])
         cluster_ids = np.asarray(data.particles["Cluster"])
-
-
-
-        coordination_ovito = np.asarray(data.particles["Coordination"])
-        coordination_index = np.sum(voro_indices, axis=1)
-        print("Index-derived CN:", coordination_index[:10])
-        print("OVITO CN:", coordination_ovito[:10])
-        print(
-            "Maximum difference:",
-            np.max(np.abs(coordination_index - coordination_ovito)))
         
         cell = data.cell
         box = freud.box.Box(
