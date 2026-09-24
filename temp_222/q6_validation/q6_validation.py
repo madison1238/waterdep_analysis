@@ -23,7 +23,7 @@ print("Frames:", pipeline.source.num_frames, flush=True)
 pipeline.modifiers.append(ChillPlusModifier())
 pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
 pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True))
-voro = VoronoiAnalysisModifier(compute_indices=True, edge_threshold=3.5)
+voro = VoronoiAnalysisModifier(compute_indices=True, edge_threshold=1.0)
 pipeline.modifiers.append(voro)
 
 os.makedirs(config.output, exist_ok=True)
