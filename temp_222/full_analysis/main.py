@@ -10,5 +10,5 @@ min_n = 5
 max_n = 60
 timestep_inteveral = 5
 
-calculate_CN_pyscal()
+calculate_CN_pyscal(1)
 

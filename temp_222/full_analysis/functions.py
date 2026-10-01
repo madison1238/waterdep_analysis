@@ -300,8 +300,8 @@ def copy_to_folder(source_path, destination_folder):
             f"Source does not exist: {source_path}"
         )
 
-def calculate_CN_pyscal(frame=-1):
-    atoms = read("dump.lammpstrj", index=frame, format="lammps-dump-text")
+def calculate_CN_pyscal(sim_num,frame=-1):
+    atoms = read(f"../sims/sim_{sim_num}/dump.mWC2.lammpstrj", index=frame, format="lammps-dump-text")
     pyscal.find_neighbors(atoms, method="voronoi")
     cn = pyscal.coordination_number(atoms)
     #print(cn)
