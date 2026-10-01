@@ -1,7 +1,9 @@
 import csv
 import os
 import shutil
-
+from ase.io import read
+import pyscal
+import numpy as np
 
 def femtoseconds_to_picoseconds(fs, ts):
     return fs * ts * 0.001
@@ -298,3 +300,13 @@ def copy_to_folder(source_path, destination_folder):
             f"Source does not exist: {source_path}"
         )
 
+def calculate_CN_pyscal():
+    atoms = read("dump.lammpstrj", index=-1, format="lammps-dump-text")
+    # Find Voronoi neighbors
+    pyscal.find_neighbors(atoms, method="voronoi")
+    # Calculate coordination number
+    cn = pyscal.coordination_number(atoms)
+    print(cn)
+    print("Mean CN:", np.mean(cn))
+    print("Min CN:", np.min(cn))
+    print("Max CN:", np.max(cn))
