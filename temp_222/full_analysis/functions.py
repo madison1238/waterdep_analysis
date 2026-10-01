@@ -300,13 +300,13 @@ def copy_to_folder(source_path, destination_folder):
             f"Source does not exist: {source_path}"
         )
 
-def calculate_CN_pyscal():
-    atoms = read("dump.lammpstrj", index=-1, format="lammps-dump-text")
-    # Find Voronoi neighbors
+def calculate_CN_pyscal(frame=-1):
+    atoms = read("dump.lammpstrj", index=frame, format="lammps-dump-text")
     pyscal.find_neighbors(atoms, method="voronoi")
-    # Calculate coordination number
     cn = pyscal.coordination_number(atoms)
-    print(cn)
+    #print(cn)
+    print("First 20 CNs:", cn[:20])
     print("Mean CN:", np.mean(cn))
     print("Min CN:", np.min(cn))
     print("Max CN:", np.max(cn))
+    return cn
