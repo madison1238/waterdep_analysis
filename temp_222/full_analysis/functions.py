@@ -4,6 +4,9 @@ import shutil
 from ase.io import read
 import pyscal
 import numpy as np
+from ovito.io import import_file
+import freud.box
+from ase import Atoms
 
 def femtoseconds_to_picoseconds(fs, ts):
     return fs * ts * 0.001
@@ -300,14 +303,29 @@ def copy_to_folder(source_path, destination_folder):
             f"Source does not exist: {source_path}"
         )
 
-def calculate_CN_pyscal(sim_num,frame=-1):
-    atoms = read(f"../sims/sim_{sim_num}/dump.mWC2.lammpstrj", index=frame, format="lammps-dump-text")
-    pyscal.find_neighbors(atoms, method="voronoi")
-    print(atoms.arrays.keys())
+
+def load_frame(filename, frame=0):
+    pipeline = import_file(filename)
+    data = pipeline.compute(frame)
+    ids = np.asarray(data.particles["Particle Identifier"])
+    positions = np.asarray(data.particles["Position"])
+    cell = data.cell
+    box = freud.box.Box(
+        Lx=cell[0,0],
+        Ly=cell[1,1],
+        Lz=cell[2,2]
+    )
+    return ids, positions, box
+
+
+
+def calculate_pyscal_cn(filename, frame=-1):
+    ids, positions, box = load_frame(filename, frame)
+    atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
+    pyscal.find_neighbors(atoms,method="voronoi")
     cn = pyscal.coordination_number(atoms)
-    #print(cn)
     print("First 20 CNs:", cn[:20])
     print("Mean CN:", np.mean(cn))
     print("Min CN:", np.min(cn))
     print("Max CN:", np.max(cn))
-    return cn
+    return ids, cn
