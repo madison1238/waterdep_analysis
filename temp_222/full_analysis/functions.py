@@ -303,6 +303,7 @@ def copy_to_folder(source_path, destination_folder):
 def calculate_CN_pyscal(sim_num,frame=-1):
     atoms = read(f"../sims/sim_{sim_num}/dump.mWC2.lammpstrj", index=frame, format="lammps-dump-text")
     pyscal.find_neighbors(atoms, method="voronoi")
+    print(atoms.arrays.keys())
     cn = pyscal.coordination_number(atoms)
     #print(cn)
     print("First 20 CNs:", cn[:20])
