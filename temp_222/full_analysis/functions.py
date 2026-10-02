@@ -315,6 +315,12 @@ def load_frame(filename, frame=0):
         Ly=cell[1,1],
         Lz=cell[2,2]
     )
+    print("OVITO cell:")
+    print(cell)
+    print("Freud box:")
+    print(box)
+    print("Box lengths:", box.Lx, box.Ly, box.Lz)
+
     return ids, positions, box
 
 
@@ -322,6 +328,10 @@ def load_frame(filename, frame=0):
 def calculate_pyscal_cn(filename, frame=-1):
     ids, positions, box = load_frame(filename, frame)
     atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
+
+    print("ASE cell:")
+    print(atoms.cell)
+
     pyscal.find_neighbors(atoms,method="voronoi")
     cn = pyscal.coordination_number(atoms)
     print("First 20 CNs:", cn[:20])
