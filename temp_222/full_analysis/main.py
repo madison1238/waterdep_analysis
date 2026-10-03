@@ -50,6 +50,9 @@ print(ovito_atoms.cell.array)
 print("\nCell difference:")
 print(original.cell.array - ovito_atoms.cell.array)
 
+print("Original PBC:", original.pbc)
+print("OVITO PBC:", ovito_atoms.pbc)
+
 
 print("\nOriginal:")
 print("Mean:", np.mean(original_cn))
