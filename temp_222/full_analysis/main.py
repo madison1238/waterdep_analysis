@@ -35,6 +35,13 @@ original_cn = pyscal.coordination_number(original)
 pyscal.find_neighbors(ovito_atoms,method="voronoi")
 ovito_cn = pyscal.coordination_number(ovito_atoms)
 
+position_diff = np.abs(original.positions - ovito_atoms.positions)
+print("Maximum position difference:", np.max(position_diff))
+print("Mean position difference:", np.mean(position_diff))
+different_positions = np.where(np.any(original.positions != ovito_atoms.positions, axis=1))[0]
+print("Number of atoms with different positions:",len(different_positions))
+print("First 10 differing indices:", different_positions[:10])
+
 print("\nOriginal:")
 print("Mean:", np.mean(original_cn))
 print("Min:", np.min(original_cn))
