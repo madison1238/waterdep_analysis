@@ -54,12 +54,12 @@ print("Original PBC:", original.pbc)
 print("OVITO PBC:", ovito_atoms.pbc)
 
 
-print("\nOriginal:")
+print("\nOriginal CN:")
 print("Mean:", np.mean(original_cn))
 print("Min:", np.min(original_cn))
 print("Max:", np.max(original_cn))
 
-print("\nOVITO:")
+print("\nOVITO CN:")
 print("Mean:", np.mean(ovito_cn))
 print("Min:", np.min(ovito_cn))
 print("Max:", np.max(ovito_cn))
