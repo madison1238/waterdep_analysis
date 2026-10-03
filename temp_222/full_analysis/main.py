@@ -42,6 +42,15 @@ different_positions = np.where(np.any(original.positions != ovito_atoms.position
 print("Number of atoms with different positions:",len(different_positions))
 print("First 10 differing indices:", different_positions[:10])
 
+
+print("Original cell:")
+print(original.cell.array)
+print("\nOVITO cell:")
+print(ovito_atoms.cell.array)
+print("\nCell difference:")
+print(original.cell.array - ovito_atoms.cell.array)
+
+
 print("\nOriginal:")
 print("Mean:", np.mean(original_cn))
 print("Min:", np.min(original_cn))
