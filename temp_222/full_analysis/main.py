@@ -18,7 +18,7 @@ from functions import load_frame
 
 original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
 
-ids, positions, box = load_frame("YOUR_DUMP_FILE",frame=-1)
+ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj",frame=-1)
 ovito_atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
 
 
