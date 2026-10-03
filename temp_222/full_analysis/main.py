@@ -15,6 +15,7 @@ from ase import Atoms
 import pyscal
 import numpy as np
 from functions import load_frame
+from ovito.io import import_file
 
 original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
 
@@ -66,4 +67,21 @@ print("Max:", np.max(ovito_cn))
 
 print("\nMaximum CN difference:",
       np.max(np.abs(original_cn - ovito_cn)))
+
+
+pipeline = import_file("../sims/sim_1/dump.mWC2.lammpstrj")
+data = pipeline.compute(pipeline.source.num_frames - 1)
+
+print("OVITO cell matrix:")
+print(np.asarray(data.cell))
+
+print("\nOVITO cell volume:")
+print(data.cell.volume)
+
+print("\nOVITO cell origin:")
+print(data.cell[:, 3])
+
+print("\nOVITO particle position range:")
+print("Min:", np.min(data.particles.positions, axis=0))
+print("Max:", np.max(data.particles.positions, axis=0))
 
