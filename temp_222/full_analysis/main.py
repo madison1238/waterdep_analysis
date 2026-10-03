@@ -71,16 +71,12 @@ print("\nMaximum CN difference:",
 
 pipeline = import_file("../sims/sim_1/dump.mWC2.lammpstrj")
 data = pipeline.compute(pipeline.source.num_frames - 1)
-
 print("OVITO cell matrix:")
 print(np.asarray(data.cell))
-
 print("\nOVITO cell volume:")
 print(data.cell.volume)
-
 print("\nOVITO cell origin:")
 print(data.cell[:, 3])
-
 print("\nOVITO particle position range:")
 print("Min:", np.min(data.particles.positions, axis=0))
 print("Max:", np.max(data.particles.positions, axis=0))
