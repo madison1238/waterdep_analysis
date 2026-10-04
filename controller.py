@@ -51,7 +51,7 @@ def g_m3_to_molecule_A3(g_m3):
 
 
 
-def cluster_info(dump_file, output_file):
+def cluster_info(dump_file, output_file, box_length):
     latest_clusters = {}
     latest_timestep = None
     with open (dump_file, 'r') as f:
@@ -106,7 +106,6 @@ def cluster_info(dump_file, output_file):
             else:
                 condensed_molecules += size
 
-        box_length = 1232 * 2 # 2464 Angstroms
         total_volume = box_length ** 3 #Angstroms^3
         volume_per_molecule = 30.0 #A^3 
         cluster_volume = condensed_molecules * volume_per_molecule
@@ -182,17 +181,18 @@ def graph_density(all_timesteps,all_density):
 
 
 def main():
-    box_length = 1232 * 2 #2464 Angstroms
+    box_length = 1126 # Angstroms
     timestep = 5
     s = 524288
     nW_base = 1
     base_density = g_m3_to_molecule_A3(.002)
     target_density = base_density * s
-    nW = round(nW_base * target_density/base_density)
-    cycles = 2
+    #nW = round(nW_base * target_density/base_density)
+    nW = 50000
+    cycles = 20
     start_temp = 200
     end_temp = 200
-    total_steps = 1000
+    total_steps = 1000000
     all_vapor_density_g_m3 = []
     vapor_molecules = nW
     free_volume = box_length ** 3
@@ -270,7 +270,7 @@ def main():
         (vapor_molecules,
         condensed_molecules,
         vapor_density,
-        free_volume) = cluster_info(cycle_dump, cluster_log)
+        free_volume) = cluster_info(cycle_dump, cluster_log, box_length)
         all_vapor_density_g_m3.append(density_to_g_m3(vapor_density))
         all_timesteps.append(calculate_restart_step(cycle + 1,cycles,total_steps) * timestep)
 
