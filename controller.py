@@ -181,14 +181,27 @@ def graph_density(all_timesteps,all_density):
 
 
 def main():
-    box_length = 1126 # Angstroms
+    #box_length = 1126 # Angstroms
     timestep = 5
-    s = 524288
-    nW_base = 1
-    base_density = g_m3_to_molecule_A3(.002)
+
+    #target ss ratio
+    s = 100000
+    #number of atoms
+    nW = 52000
+
+    base_density = g_m3_to_molecule_A3(0.002)
     target_density = base_density * s
-    #nW = round(nW_base * target_density/base_density)
-    nW = 50000
+
+    box_volume = nW / target_density
+    box_length = box_volume ** (1/3)
+
+    print(f"S: {s}", flush=True)
+    print(f"Starting atoms: {nW}", flush=True)
+    print(f"Target density: {target_density:.8e} molecules/A^3", flush=True)
+    print(f"Target density: {density_to_g_m3(target_density):.8e} g/m^3", flush=True)
+    print(f"Box volume: {box_volume:.8e} A^3", flush=True)
+    print(f"Box length: {box_length:.2f} A", flush=True)
+
     cycles = 20
     start_temp = 200
     end_temp = 200
