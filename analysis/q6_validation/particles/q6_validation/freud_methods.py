@@ -1,0 +1,26 @@
+import freud
+import numpy as np
+
+
+def steinhardt_cutoff(box, positions, cutoff=3.5, average=False, l=6):
+    aq = freud.locality.AABBQuery(box, positions)
+    neighbors = aq.query(positions,{"r_max": cutoff, "exclude_ii": True}).toNeighborList()
+
+    q = freud.order.Steinhardt(l=l,average=average)
+    q.compute((box, positions),neighbors=neighbors)
+    return q.particle_order
+
+
+def steinhardt_voronoi(box,positions,average=False,l=6):
+    vor = freud.locality.Voronoi()
+    vor.compute((box, positions))
+
+    counts = np.bincount(vor.nlist.query_point_indices,
+                     minlength=len(positions))
+
+    #print("Average Voronoi neighbors:", counts.mean())
+    
+
+    q = freud.order.Steinhardt(l=l,average=average)
+    q.compute((box, positions),neighbors=vor.nlist)
+    return q.particle_order

@@ -1,0 +1,13 @@
+q6_validation/
+│
+├── q6_validation.py          # Main driver script
+├── ovito_utils.py               # Read trajectory
+├── freud_methods.py          # All freud calculations
+├── pyscal_methods.py         # All pyscal calculations
+├── compare.py                # Statistics
+├── plots.py                  # Histograms & scatter plots
+├── config.py                 # Analysis parameters
+│
+├── outputs/
+│
+└── test_data/
