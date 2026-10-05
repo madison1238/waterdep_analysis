@@ -40,7 +40,7 @@ for folder in folders:
 
         pipeline = import_file(dump)
         print("Frames:", pipeline.source.num_frames, flush=True)
-        pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True))
+        pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,sort_by_size=True))
 
         os.makedirs(output_dir, exist_ok=True)
         output_file = f"{output_dir}/ice_clusters.csv"
