@@ -10,52 +10,39 @@ min_n = 5
 max_n = 60
 timestep_inteveral = 5'''
 
+
 from ase.io import read
-from ase import Atoms
-import pyscal
-import numpy as np
-from functions import load_frame
 from ovito.io import import_file
+import numpy as np
 
-original = read(
-    "../sims/sim_1/dump.mWC2.lammpstrj",
-    index=-1,
-    format="lammps-dump-text"
-)
+path = "../sims/sim_1/dump.mWC2.lammpstrj"
 
-ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj", frame=-1)
+# ASE: read the last frame
+original = read(path, index=-1, format="lammps-dump-text")
 
-print("Number of atoms:")
-print("Original:", len(original))
-print("OVITO:", len(positions))
+# OVITO: read the last frame
+pipeline = import_file(path)
+last_frame = pipeline.source.num_frames - 1
+data = pipeline.compute(last_frame)
 
-print("\nPosition comparison:")
-print("Original first 5:")
+ovito_positions = np.asarray(data.particles["Position"])
+
+print("ASE atoms:", len(original))
+print("OVITO atoms:", len(ovito_positions))
+print("Number of frames:", pipeline.source.num_frames)
+print("Last frame index:", last_frame)
+
+print("\nASE first 5 positions:")
 print(original.positions[:5])
 
-print("\nOVITO first 5:")
-print(positions[:5])
+print("\nOVITO first 5 positions:")
+print(ovito_positions[:5])
 
-print("\nDifference first 5:")
-print(original.positions[:5] - positions[:5])
+print("\nASE cell:")
+print(original.cell)
 
-# Compare all positions
-difference = original.positions - positions
-
-print("\nMaximum absolute position difference:")
-print(np.max(np.abs(difference)))
-
-print("Mean absolute position difference:")
-print(np.mean(np.abs(difference)))
-
-print("Number of atoms with any position difference:")
-print(np.sum(np.any(np.abs(difference) > 1e-10, axis=1)))
-
-print("\nOriginal cell:")
-print(original.cell.lengths())
-
-print("OVITO cell:")
-print(box.Lx, box.Ly, box.Lz)
+print("\nOVITO cell:")
+print(np.asarray(data.cell.matrix))
 
 '''#original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
 ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj", frame=-1)
