@@ -309,16 +309,8 @@ def load_frame(filename, frame=0):
     data = pipeline.compute(frame)
     ids = np.asarray(data.particles["Particle Identifier"])
     positions = np.asarray(data.particles["Position"])
-    cell = data.cell
-    box = freud.box.Box(
-        Lx=cell[0,0],
-        Ly=cell[1,1],
-        Lz=cell[2,2]
-    )
-
-    print("OVITO first 5 positions:")
-    print(positions[:5])    
-
+    cell_matrix = np.asarray(data.cell.matrix)
+    box = freud.box.Box.from_matrix(cell_matrix[:, :3])
     return ids, positions, box
 
 
