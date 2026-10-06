@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 pyscal_cn = []
 ovito_cn = []
-with open("pyscal_vs_ovito_cn.csv", "r") as f:
+with open("../summary/pyscal_vs_ovito_cn.csv", "r") as f:
     reader = csv.DictReader(f)
     for row in reader:
         pyscal_cn.append(int(row["Pyscal_CN"]))
