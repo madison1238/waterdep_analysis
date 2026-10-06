@@ -17,7 +17,28 @@ import numpy as np
 from functions import load_frame
 from ovito.io import import_file
 
-original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
+ids, positions, box = load_frame(filename, frame=-1)
+
+atoms = Atoms(
+    symbols=["O"] * len(positions),
+    positions=positions,
+    cell=box.to_matrix(),
+    pbc=True
+)
+
+print("Position range:")
+print("OVITO min:", positions.min(axis=0))
+print("OVITO max:", positions.max(axis=0))
+
+print("\nASE position range:")
+print("ASE min:", atoms.positions.min(axis=0))
+print("ASE max:", atoms.positions.max(axis=0))
+
+print("\nBox dimensions:")
+print("OVITO:", box.Lx, box.Ly, box.Lz)
+print("ASE:", atoms.cell.lengths())
+
+'''original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
 
 ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj",frame=-1)
 ovito_atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
@@ -79,5 +100,5 @@ print("\nOVITO cell origin:")
 print(data.cell[:, 3])
 print("\nOVITO particle position range:")
 print("Min:", np.min(data.particles.positions, axis=0))
-print("Max:", np.max(data.particles.positions, axis=0))
+print("Max:", np.max(data.particles.positions, axis=0))'''
 
