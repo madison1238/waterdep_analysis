@@ -17,7 +17,29 @@ import numpy as np
 from functions import load_frame
 from ovito.io import import_file
 
-#original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
+original = read(
+    "../sims/sim_1/dump.mWC2.lammpstrj",
+    index=-1,
+    format="lammps-dump-text"
+)
+
+print("Original cell:")
+print(original.cell.lengths())
+
+original.set_cell([73.0, 73.0, 73.0], scale_atoms=False)
+
+print("\nNew cell:")
+print(original.cell.lengths())
+
+pyscal.find_neighbors(original, method="voronoi")
+cn_original_fixed = pyscal.coordination_number(original)
+
+print("\nCN with 73 Å box:")
+print("Mean:", np.mean(cn_original_fixed))
+print("Min:", np.min(cn_original_fixed))
+print("Max:", np.max(cn_original_fixed))
+
+'''#original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
 ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj", frame=-1)
 
 atoms = Atoms(
@@ -47,7 +69,7 @@ print("Mean:", np.mean(cn))
 print("Min:", np.min(cn))
 print("Max:", np.max(cn))
 
-'''
+
 
 ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj",frame=-1)
 ovito_atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
