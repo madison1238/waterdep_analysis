@@ -23,21 +23,39 @@ original = read(
     format="lammps-dump-text"
 )
 
-print("Original cell:")
+ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj", frame=-1)
+
+print("Number of atoms:")
+print("Original:", len(original))
+print("OVITO:", len(positions))
+
+print("\nPosition comparison:")
+print("Original first 5:")
+print(original.positions[:5])
+
+print("\nOVITO first 5:")
+print(positions[:5])
+
+print("\nDifference first 5:")
+print(original.positions[:5] - positions[:5])
+
+# Compare all positions
+difference = original.positions - positions
+
+print("\nMaximum absolute position difference:")
+print(np.max(np.abs(difference)))
+
+print("Mean absolute position difference:")
+print(np.mean(np.abs(difference)))
+
+print("Number of atoms with any position difference:")
+print(np.sum(np.any(np.abs(difference) > 1e-10, axis=1)))
+
+print("\nOriginal cell:")
 print(original.cell.lengths())
 
-original.set_cell([73.0, 73.0, 73.0], scale_atoms=False)
-
-print("\nNew cell:")
-print(original.cell.lengths())
-
-pyscal.find_neighbors(original, method="voronoi")
-cn_original_fixed = pyscal.coordination_number(original)
-
-print("\nCN with 73 Å box:")
-print("Mean:", np.mean(cn_original_fixed))
-print("Min:", np.min(cn_original_fixed))
-print("Max:", np.max(cn_original_fixed))
+print("OVITO cell:")
+print(box.Lx, box.Ly, box.Lz)
 
 '''#original = read("../sims/sim_1/dump.mWC2.lammpstrj",index=-1,format="lammps-dump-text")
 ids, positions, box = load_frame("../sims/sim_1/dump.mWC2.lammpstrj", frame=-1)
