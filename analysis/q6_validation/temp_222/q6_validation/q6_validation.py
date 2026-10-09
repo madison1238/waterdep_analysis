@@ -31,8 +31,6 @@ pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType 
 cluster_mod = ClusterAnalysisModifier(
     cutoff=3.5,
     sort_by_size=True,
-    compute_gyration=True,
-    compute_com=True,
     only_selected=True
 )
 pipeline.modifiers.append(cluster_mod)
