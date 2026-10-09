@@ -18,16 +18,28 @@ from ovito_utils import *
 
 
 
-pipeline = import_file(config.dump)
+pipeline = import_file(config.dump, multiple_frames=True)
 print("Frames:", pipeline.source.num_frames, flush=True)
-pipeline.modifiers.append(ChillPlusModifier())
-pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
-pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True))
-voro = VoronoiAnalysisModifier(compute_indices=True, edge_threshold=1.0)
+# 1. Voronoi analysis on the full system
+voro = VoronoiAnalysisModifier(relative_face_threshold=0.02)
 pipeline.modifiers.append(voro)
+# 2. CHILL+ structure classification
+pipeline.modifiers.append(ChillPlusModifier(cutoff=3.5))
+# 3. Select Ih and Ic ice particles
+pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
+# 4. Cluster analysis on selected ice particles
+cluster_mod = ClusterAnalysisModifier(
+    cutoff=3.5,
+    sort_by_size=True,
+    compute_gyration=True,
+    compute_com=True,
+    only_selected=True
+)
+pipeline.modifiers.append(cluster_mod)
 
 os.makedirs(config.output, exist_ok=True)
 output_file = f"{config.output}/ice_clusters.csv"
+
 
 
 with open(output_file, "w", newline="") as f:
