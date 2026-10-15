@@ -1,66 +1,88 @@
-import csv
+from ovito.io import import_file
+from ovito.modifiers import VoronoiAnalysisModifier
+from ase import Atoms
+import pyscal
 import numpy as np
-import matplotlib.pyplot as plt
+import csv
 
 
+filename = "../sims/sim_1/dump.mWC2.lammpstrj"
 
-pyscal_cn = []
-ovito_cn = []
-with open("../summary/pyscal_vs_ovito_cn.csv", "r") as f:
-    reader = csv.DictReader(f)
-    for row in reader:
-        pyscal_cn.append(int(row["Pyscal_CN"]))
-        ovito_cn.append(int(row["OVITO_CN"]))
-pyscal_cn = np.array(pyscal_cn)
-ovito_cn = np.array(ovito_cn)
+#OVITO
+pipeline = import_file(filename)
+frame = pipeline.source.num_frames - 1
+data = pipeline.compute(frame)
+ids = np.asarray(data.particles["Particle Identifier"])
+positions = np.asarray(data.particles["Position"])
+cell = np.asarray(data.cell.matrix)
+box_lengths = [
+    cell[0, 0],
+    cell[1, 1],
+    cell[2, 2]
+]
+print("Atoms:", len(ids))
+print("Frame:", frame)
+print("Box:", box_lengths)
 
-plt.figure(figsize=(7, 7))
-plt.scatter(
-    pyscal_cn,
-    ovito_cn,
-    alpha=0.4,
-    s=20
+
+pipeline.modifiers.append(VoronoiAnalysisModifier(relative_face_threshold=0.02))
+data = pipeline.compute(frame)
+ovito_cn = np.asarray(data.particles["Coordination"])
+print("\nOVITO CN:")
+print("Mean:", np.mean(ovito_cn))
+print("Min:", np.min(ovito_cn))
+print("Max:", np.max(ovito_cn))
+
+
+#PYSCAL
+atoms = Atoms(
+    symbols=["O"] * len(positions),
+    positions=positions,
+    cell=box_lengths,
+    pbc=True
 )
 
 
-min_cn = min(pyscal_cn.min(), ovito_cn.min())
-max_cn = max(pyscal_cn.max(), ovito_cn.max())
-plt.plot(
-    [min_cn, max_cn],
-    [min_cn, max_cn],
-    linestyle="--",
-    label="Perfect agreement"
-)
+pyscal.find_neighbors(atoms,method="voronoi")
+pyscal_cn = np.asarray(pyscal.coordination_number(atoms))
+print("\nPyscal CN:")
+print("Mean:", np.mean(pyscal_cn))
+print("Min:", np.min(pyscal_cn))
+print("Max:", np.max(pyscal_cn))
 
-plt.xlabel("Pyscal Voronoi coordination number")
-plt.ylabel("OVITO Voronoi coordination number")
-plt.title("Pyscal vs. OVITO Voronoi Coordination Number")
-plt.xlim(min_cn - 1, max_cn + 1)
-plt.ylim(min_cn - 1, max_cn + 1)
-plt.gca().set_aspect("equal", adjustable="box")
-plt.legend()
 difference = pyscal_cn - ovito_cn
-mean_cn = np.mean(pyscal_cn)
-mean_abs_difference = np.mean(np.abs(difference))
-different_atoms = np.sum(difference != 0)
 
-text = (
-    f"N = {len(pyscal_cn):,} atoms\n"
-    f"Mean CN = {mean_cn:.2f}\n"
-    f"CN range = {min_cn}–{max_cn}\n"
-    f"Mean |ΔCN| = {mean_abs_difference:.2f}\n"
-    f"Atoms differing = {different_atoms}"
+print("\nComparison:")
+print("Mean difference:", np.mean(difference))
+print("Mean absolute difference:", np.mean(np.abs(difference)))
+print("Maximum absolute difference:", np.max(np.abs(difference)))
+print(
+    "Atoms with different CN:",
+    np.sum(difference != 0)
 )
 
 
-plt.text(
-    0.05,
-    0.95,
-    text,
-    transform=plt.gca().transAxes,
-    verticalalignment="top",
-    bbox=dict(boxstyle="round", alpha=0.8))
-plt.tight_layout()
-plt.savefig("../summary/pyscal_vs_ovito_cn.png",)
+
+with open("../summary/pyscal_vs_ovito_cn.csv", "w", newline="") as f:
+    writer = csv.writer(f)
+    writer.writerow([
+        "Atom_ID",
+        "Pyscal_CN",
+        "OVITO_CN",
+        "Difference"
+    ])
+    for atom_id, p_cn, o_cn, diff in zip(
+        ids,
+        pyscal_cn,
+        ovito_cn,
+        difference
+    ):
+        writer.writerow([
+            atom_id,
+            p_cn,
+            o_cn,
+            diff
+        ])
+print("\nSaved: pyscal_vs_ovito_cn.csv")
 
 
