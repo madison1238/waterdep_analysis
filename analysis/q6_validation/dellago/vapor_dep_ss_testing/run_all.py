@@ -5,9 +5,13 @@ import os
 
 
 
-TOTAL_SIMS = 50
+TOTAL_SIMS = 57
 MAX_JOBS = 30
 CHECK_INTERVAL = 60  # seconds
+SUBMITTED_FILE = "submitted_sims.txt"
+
+ss_ratios = [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000]
+temps =  [180,190,200,210,220,230,240]
 
 # starting
 next_sim = 1
@@ -15,6 +19,17 @@ next_sim = 1
 def log(message):
     now = datetime.now().strftime("%H:%M:%S")
     print(f"[{now}] {message}", flush=True)
+
+def load_submitted():
+    if not os.path.exists(SUBMITTED_FILE):
+        return set()
+
+    with open(SUBMITTED_FILE, "r") as file:
+        return {line.strip() for line in file if line.strip()}
+
+def save_submitted(sim_key):
+    with open(SUBMITTED_FILE, "a") as file:
+        file.write(sim_key + "\n")
 
 
 def get_my_job_count():
@@ -31,39 +46,43 @@ def get_my_job_count():
         return None
 
     jobs = result.stdout.strip().splitlines()
-
     return len(jobs)
 
 
-def submit_simulation(sim_number):
+def submit_simulation(temp,ss_ratio):
+    sim_key = f"ss_{ss_ratio}/temp_{temp}"
+    sim_directory = f"../sims/ss_{ss_ratio}/temp_{temp}"
 
-    sim_directory = f"../sims/sim_{sim_number}/q6_validation"
-
-    #print(f"Submitting simulation {sim_number}", flush=True)
-    #print(f"Directory: {sim_directory}", flush=True)
-
-    command = ["sbatch","sb.validation"]
+    command = ["sbatch","sb.controller"]
     result = subprocess.run(command,capture_output=True,text=True,cwd=sim_directory)
     if result.returncode == 0:
-        log(f"Submitted simulation {sim_number}")
+        log(f"Submitted simulation ss_{ss_ratio}/temp_{temp}")
         log(f"    {result.stdout.strip()}")
         return True
 
     else:
-        log(f"ERROR submitting simulation {sim_number}")
+        log(f"ERROR submitting simulation ss_{ss_ratio}/temp_{temp}")
         log(result.stderr.strip())
         return False
 
 
 def main():
-    global next_sim
+    submitted = load_submitted()
+    simulations = [(ss_ratio, temp) for ss_ratio in ss_ratios for temp in temps]
     log("=" * 50)
     log("Starting simulation job manager")
     log("=" * 50)
     log(f"Total simulations: {TOTAL_SIMS}")
+    log(f"Already submitted: {len(submitted)}")
     log(f"Maximum jobs: {MAX_JOBS}")
     log(f"Check interval: {CHECK_INTERVAL} seconds")
-    while next_sim <= TOTAL_SIMS:
+    log("=" * 50)
+
+    while True:
+        pending = [(ss_ratio, temp) for ss_ratio in ss_ratios for temp in temps if f"ss_{ss_ratio}/temp_{temp}" not in submitted]
+
+        if not pending:
+            break
         log("")
         log("Checking Slurm queue...")
         job_count = get_my_job_count()
@@ -78,17 +97,18 @@ def main():
             log("Queue is full.")
             log(f"Waiting {CHECK_INTERVAL} seconds...")
         else:
-            simulations_remaining = TOTAL_SIMS - next_sim + 1
-            num_to_submit = min(available_slots,simulations_remaining)
+            num_to_submit = min(available_slots, len(pending))
             log(f"Submitting {num_to_submit} simulation(s)...")
-            for _ in range(num_to_submit):
-                success = submit_simulation(next_sim)
+            for ss_ratio, temp in pending[:num_to_submit]:
+                sim_key = f"ss_{ss_ratio}/temp_{temp}"
+                success = submit_simulation(temp, ss_ratio)
                 if success:
-                    next_sim += 1
+                    submitted.add(sim_key)
+                    save_submitted(sim_key)
                 else:
                     log("Submission failed. " "Will retry later.")
                     break
-        # Don't check again immediately
+        log(f"Completed submissions: {len(submitted)}/{len(simulations)}")
         time.sleep(CHECK_INTERVAL)
     log("")
     log("=" * 50)
