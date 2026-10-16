@@ -51,7 +51,7 @@ def get_my_job_count():
 
 def submit_simulation(temp,ss_ratio):
     sim_key = f"ss_{ss_ratio}/temp_{temp}"
-    sim_directory = f"../sims/ss_{ss_ratio}/temp_{temp}"
+    sim_directory = f"sims/ss_{ss_ratio}/temp_{temp}"
 
     command = ["sbatch","sb.controller"]
     result = subprocess.run(command,capture_output=True,text=True,cwd=sim_directory)
