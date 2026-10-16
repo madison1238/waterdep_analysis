@@ -68,7 +68,15 @@ def submit_simulation(temp,ss_ratio):
 
 def main():
     submitted = load_submitted()
-    simulations = [(ss_ratio, temp) for ss_ratio in ss_ratios for temp in temps]
+    simulations = []
+
+    for ss_ratio in ss_ratios:
+        for temp in temps:
+            if (ss_ratio == 100000) and (temp >= 210):
+                continue
+            if (ss_ratio == 500000) and (temp < 200):
+                continue
+            simulations.append((ss_ratio, temp))    
     log("=" * 50)
     log("Starting simulation job manager")
     log("=" * 50)
