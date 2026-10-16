@@ -5,7 +5,6 @@ import os
 
 
 
-TOTAL_SIMS = 57
 MAX_JOBS = 30
 CHECK_INTERVAL = 60  # seconds
 SUBMITTED_FILE = "submitted_sims.txt"
@@ -80,15 +79,14 @@ def main():
     log("=" * 50)
     log("Starting simulation job manager")
     log("=" * 50)
-    log(f"Total simulations: {TOTAL_SIMS}")
+    log(f"Total simulations: {len(simulations)}")
     log(f"Already submitted: {len(submitted)}")
     log(f"Maximum jobs: {MAX_JOBS}")
     log(f"Check interval: {CHECK_INTERVAL} seconds")
     log("=" * 50)
 
     while True:
-        pending = [(ss_ratio, temp) for ss_ratio in ss_ratios for temp in temps if f"ss_{ss_ratio}/temp_{temp}" not in submitted]
-
+        pending = [(ss_ratio, temp) for ss_ratio, temp in simulations if f"ss_{ss_ratio}/temp_{temp}" not in submitted]
         if not pending:
             break
         log("")
