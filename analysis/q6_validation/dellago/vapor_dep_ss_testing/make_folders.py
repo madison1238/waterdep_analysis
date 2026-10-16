@@ -7,14 +7,14 @@ for ss in ss_ratios:
     ss_dir = f"sims/ss_{ss}"
     os.makedirs(ss_dir, exist_ok=True)
     for temp in temps:
-        if (ss == 100000) and (temp <= 210):
+        if (ss == 100000) and (temp >= 210):
             continue
         if (ss== 500000) and (temp < 200):
             continue
         temp_dir = f"{ss_dir}/temp_{temp}"
         os.makedirs(temp_dir, exist_ok=True)
 
-        shutil.copytree('base/*', temp_dir, dirs_exist_ok=True)
+        shutil.copytree('base', temp_dir, dirs_exist_ok=True)
         controller_script = f"{temp_dir}/controller.py"
         sb_controller = f"{temp_dir}/sb.controller"
 
@@ -31,7 +31,7 @@ for ss in ss_ratios:
         job_name = f"t_{temp}_ss_{ss}_cont"
         with open(sb_controller, 'r') as f:
             sb_controller_text = f.read()
-        controller_text = re.sub(r"\bJOB_NAME1\b", str(temp), sb_controller_text)
+        sb_controller_text = re.sub(r"\bJOB_NAME1\b", job_name, sb_controller_text)
         with open(sb_controller, 'w') as f:
             f.write(sb_controller_text)
         
