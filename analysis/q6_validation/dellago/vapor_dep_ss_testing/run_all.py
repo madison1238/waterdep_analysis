@@ -5,7 +5,7 @@ import os
 
 
 
-MAX_JOBS = 30
+MAX_JOBS = 13
 CHECK_INTERVAL = 60  # seconds
 SUBMITTED_FILE = "submitted_sims.txt"
 
