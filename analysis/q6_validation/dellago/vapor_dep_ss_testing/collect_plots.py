@@ -2,9 +2,9 @@ from ovito.io import import_file
 from ovito.modifiers import (
     ClusterAnalysisModifier,
 )
-import numpy as np
 import csv
 import os
+import shutil
 import matplotlib.pyplot as plt
 
 ss_ratios = [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000]
@@ -29,11 +29,37 @@ def plot_largest_vs_time(filename, save):
     plt.title("Largest Cluster Size vs. Time")
     plt.tight_layout()
     plt.savefig(save)
+    plt.close()
+
+def collect_plots(output):
+    os.makedirs(output,exist_ok=True)
+    for ss_ratio in ss_ratios:
+        for temp in temps:
+            if (ss_ratio == 100000) and (temp >= 210):
+                continue
+            if (ss_ratio == 500000) and (temp < 200):
+                continue
+            sim_directory = f"sims/ss_{ss_ratio}/temp_{temp}"
+            plot_path = f"{sim_directory}/summary/largest_vs_time.png"
+            if os.path.exists(plot_path):
+                copy_plot_directory = f"{output}/ss_{ss_ratio}"
+                os.makedirs(f"{output}/ss_{ss_ratio}", exist_ok=True)
+                copy_plot_file = f"{copy_plot_directory}/temp_{temp}.png"
+                shutil.copy(plot_path, copy_plot_file)
+                print(f"Copied {plot_path} -> {copy_plot_file}")
+            else:
+                print(f"Could not find {plot_path}")
 
 
-for folder in folders:
-    for ratio in ss_ratios:
-        directory = f"{folder}/{ratio}"
+
+
+for ss_ratio in ss_ratios:
+    for temp in temps:
+        if (ss_ratio == 100000) and (temp >= 210):
+            continue
+        if (ss_ratio == 500000) and (temp < 200):
+            continue
+        directory = f"sims/ss_{ss_ratio}/temp_{temp}"
         dump = f"{directory}/dumps/dump.combined.lammpstrj"
         output_dir = f"{directory}/summary"
 
@@ -76,3 +102,4 @@ for folder in folders:
                     f"Largest {largest_cluster:4d} | ",
                     flush=True)
         plot_largest_vs_time(output_file,save_file)
+collect_plots('figure_2a')
