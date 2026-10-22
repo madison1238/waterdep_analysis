@@ -7,8 +7,11 @@ import os
 import shutil
 import matplotlib.pyplot as plt
 
-ss_ratios = [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000]
-temps =  [180,190,200,210,220,230,240]
+#ss_ratios = [100000, 150000, 200000, 250000, 300000, 350000, 400000, 450000, 500000]
+#temps =  [180,190,200,210,220,230,240]
+
+ss_ratios = [250000]
+temps =  [210]
 
 def plot_largest_vs_time(filename, save):
     with open(filename, "r") as file:
