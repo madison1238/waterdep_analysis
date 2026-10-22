@@ -27,11 +27,13 @@ def largest_cluster_info(dump, frame):
 
 
     ids_in_largest = cluster_ids == largest_cluster_id
-    ih = np.sum(structure_types[in_largest] == 1)
-    ic = np.sum(structure_types[in_largest] == 2)
+    ih = np.sum(structure_types[ids_in_largest] == 1)
+    ic = np.sum(structure_types[ids_in_largest] == 2)
     ih_fraction = ih / largest_cluster_size
     ic_fraction = ic / largest_cluster_size
 
-    timestep = int(data.attributes["Timestep"])
     return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction
+
+def largest_q6_q4_tetra(dump, frame, ids):
+    pass
 
