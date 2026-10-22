@@ -12,7 +12,7 @@ import os
 
 
 def largest_cluster_info(dump, frame):
-    #returns largest cluster size n, num of IC IH, fraction of IC and IH
+    #returns largest cluster size n, cluster_ids in largest, num of IC IH, fraction of IC and IH
     pipeline = import_file(dump)
     pipeline.modifiers.append(ChillPlusModifier())
     pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
@@ -26,11 +26,12 @@ def largest_cluster_info(dump, frame):
     largest_cluster_size = int(data.attributes.get["ClusterAnalysis.largest_size"],0)
 
 
-    in_largest = cluster_ids == largest_cluster_id
+    ids_in_largest = cluster_ids == largest_cluster_id
     ih = np.sum(structure_types[in_largest] == 1)
     ic = np.sum(structure_types[in_largest] == 2)
     ih_fraction = ih / largest_cluster_size
     ic_fraction = ic / largest_cluster_size
 
     timestep = int(data.attributes["Timestep"])
-    return largest_cluster_size, ic, ih, ic_fraction, ih_fraction
+    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction
+
