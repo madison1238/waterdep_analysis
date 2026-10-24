@@ -98,6 +98,15 @@ def calculate_i_j_k(lamba1, lambda2, lambda3):
 
 
 
+def caluculate_E_1_6(largest_cluster_size, q6,k, Rg, mean_v, std_v, mean_cn, std_sn, ):
+    E1 = largest_cluster_size * q6
+    E2 = k / (Rg**2)
+    E3 = std_v/mean_v
+    E4 = std_sn/mean_cn
+    E5 = (1+E3 + E4 - q6) / 3
+    E6 = largest_cluster_size / (Rg**3)
+    return E1,E2,E3,E4,E5,E6
+
 def pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.5, param=6):
     atoms = Atoms(symbols=["O"] * len(positions), positions=positions, cell=[box.Lx, box.Ly, box.Lz], pbc=True)
     if method == 'cutoff':
