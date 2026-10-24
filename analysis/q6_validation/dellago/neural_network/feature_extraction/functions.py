@@ -5,7 +5,6 @@ from ovito.modifiers import (
     ClusterAnalysisModifier,
     VoronoiAnalysisModifier
 )
-import config
 import pyscal
 import freud
 import numpy as np
@@ -28,7 +27,7 @@ def largest_cluster_info(dump, frame):
     cluster_ids = np.asarray(data.particles["Cluster"])
     timestep = int(data.attributes["Timestep"])
    
-    clusters = data.particle_systems["clusters"]
+    clusters = data.tables["clusters"]
     cluster_sizes = np.asarray(clusters["Cluster Size"])
     radii = np.asarray(clusters["Radius of Gyration"])
     gyration_tensors = np.asarray(clusters["Gyration Tensor"])
