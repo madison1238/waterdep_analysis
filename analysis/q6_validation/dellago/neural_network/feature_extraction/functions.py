@@ -16,7 +16,7 @@ from ase import Atoms
 
 
 def largest_cluster_info(dump, frame):
-    #returns largest cluster size n, cluster_ids in largest, all ids in systen, num of IC IH, fraction of IC and IH
+    #returns largest cluster size n,all ids in systen, num of IC IH, fraction of IC and IH
     pipeline = import_file(dump)
     pipeline.modifiers.append(ChillPlusModifier())
     pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
@@ -25,7 +25,6 @@ def largest_cluster_info(dump, frame):
     data = pipeline.compute(frame)
     structure_types = np.asarray(data.particles["Structure Type"])
     cluster_ids = np.asarray(data.particles["Cluster"])
-    all_ids = np.asarray(data.particles['Particle Identifier'])
     timestep = int(data.attributes["Timestep"])
     largest_cluster_id = int(data.attribute.get["ClusterAnalysis.largest_cluster"],0)
     largest_cluster_size = int(data.attributes.get["ClusterAnalysis.largest_size"],0)
