@@ -69,7 +69,11 @@ def largest_q6_q4_tetra(dump, frame, ids_in_largest):
     cluster_q4 = q4[ids_in_largest]
     cluster_tetra = tetra[ids_in_largest]
 
-    return cluster_q6, cluster_q4, cluster_tetra
+    return (
+        float(np.mean(cluster_q6)),
+        float(np.mean(cluster_q4)),
+        float(np.mean(cluster_tetra))
+    )
 
 def largest_vol_cn(dump,frame,ids_in_largest):
     pipeline = import_file(dump)
