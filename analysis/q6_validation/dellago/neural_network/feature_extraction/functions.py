@@ -2,7 +2,8 @@ from ovito.io import import_file
 from ovito.modifiers import (
     ChillPlusModifier,
     ExpressionSelectionModifier,
-    ClusterAnalysisModifier
+    ClusterAnalysisModifier,
+    VoronoiAnalysisModifier
 )
 import config
 import pyscal
@@ -58,6 +59,25 @@ def largest_q6_q4_tetra(dump, frame, ids_in_largest, all_ids):
     cluster_tetra = calculate_cluster_param(ids_in_largest, all_ids, tetra)
 
     return cluster_q6, cluster_q4, cluster_tetra
+
+def largest_vol_cn(dump,frame,ids_in_largest,all_ids):
+    pipeline = import_file(dump)
+    voro = VoronoiAnalysisModifier(relative_face_threshold=0.02)
+    pipeline.modifiers.append(voro)
+    data = pipeline.compute(frame)
+    coordination = np.asarray(data.particles["Coordination"])
+    voronoi_vol = np.asarray(data.particles['Atomic Volume'])
+
+    cluster_cn = coordination[ids_in_largest]
+    cluster_vol = voronoi_vol[ids_in_largest]
+
+    mean_cn = np.mean(cluster_cn)
+    std_cn = np.std(cluster_cn)
+
+    mean_vol = np.mean(cluster_vol)
+    std_vol = np.std(cluster_vol)
+
+    return mean_cn, std_cn, mean_vol, std_vol
 
 
 
