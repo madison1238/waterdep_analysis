@@ -107,21 +107,3 @@ def pyscal_tetrahedrality(positions, box, method='cutoff', cutoff=3.5):
     return tetrahedrality
 
 
-def calculate_cluster_param(tracked_particles, ids, parameter_list):
-    id_to_index = {
-        particle_id: i
-        for i, particle_id in enumerate(ids)
-    }
-    tracked_indices = [
-        id_to_index[particle_id]
-        for particle_id in tracked_particles
-        if particle_id in id_to_index
-    ]
-    cluster_values = parameter_list[tracked_indices]
-    if len(cluster_values) == 0:
-        return np.nan
-    valid_count = np.count_nonzero(~np.isnan(cluster_values))
-    if valid_count == 0:
-        print("WARNING: No valid values for this cluster!", flush=True)
-        return np.nan
-    return np.nanmean(cluster_values)
