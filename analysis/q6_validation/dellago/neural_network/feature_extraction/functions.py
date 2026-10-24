@@ -5,14 +5,17 @@ from ovito.modifiers import (
     ClusterAnalysisModifier
 )
 import config
+import pyscal
+import freud
 import numpy as np
 import csv
 import os
+from ase import Atoms
 
 
 
 def largest_cluster_info(dump, frame):
-    #returns largest cluster size n, cluster_ids in largest, num of IC IH, fraction of IC and IH
+    #returns largest cluster size n, cluster_ids in largest, all ids in systen, num of IC IH, fraction of IC and IH
     pipeline = import_file(dump)
     pipeline.modifiers.append(ChillPlusModifier())
     pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
@@ -21,6 +24,7 @@ def largest_cluster_info(dump, frame):
     data = pipeline.compute(frame)
     structure_types = np.asarray(data.particles["Structure Type"])
     cluster_ids = np.asarray(data.particles["Cluster"])
+    all_ids = np.asarray(data.particles['Particle Identifier'])
     timestep = int(data.attributes["Timestep"])
     largest_cluster_id = int(data.attribute.get["ClusterAnalysis.largest_cluster"],0)
     largest_cluster_size = int(data.attributes.get["ClusterAnalysis.largest_size"],0)
@@ -32,8 +36,75 @@ def largest_cluster_info(dump, frame):
     ih_fraction = ih / largest_cluster_size
     ic_fraction = ic / largest_cluster_size
 
-    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction
+    return largest_cluster_size, ids_in_largest, all_ids, ic, ih, ic_fraction, ih_fraction
 
-def largest_q6_q4_tetra(dump, frame, ids):
-    pass
 
+def largest_q6_q4_tetra(dump, frame, ids_in_largest, all_ids):
+    pipeline = import_file(dump)
+    data = pipeline.compute(frame)
+    positions = np.asarray(data.particles["Position"])
+    cell = data.cell
+    box = freud.box.Box(
+            Lx=cell[0, 0],
+            Ly=cell[1, 1],
+            Lz=cell[2, 2]
+    )
+    q6 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=6)
+    q4 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=4)
+    tetra = pyscal_tetrahedrality(positions,box)
+
+    cluster_q6 = calculate_cluster_param(ids_in_largest, all_ids, q6)
+    cluster_q4 = calculate_cluster_param(ids_in_largest, all_ids, q4)
+    cluster_tetra = calculate_cluster_param(ids_in_largest, all_ids, tetra)
+
+    return cluster_q6, cluster_q4, cluster_tetra
+
+
+
+
+
+
+def pyscal_steinhardt(positions, box, method='cutoff', averaged=False, cutoff=3.5, param=6):
+    atoms = Atoms(symbols=["O"] * len(positions), positions=positions, cell=[box.Lx, box.Ly, box.Lz], pbc=True)
+    if method == 'cutoff':
+        pyscal.find_neighbors(atoms, method='cutoff', cutoff=cutoff)
+    elif method == 'voronoi':
+        pyscal.find_neighbors(atoms, method='voronoi')
+    if averaged == False:
+        q=pyscal.steinhardt_parameter(atoms, l=[param])[0]
+    else:
+        q = pyscal.steinhardt_parameter(atoms, l=[param], averaged=True)[0]
+    print(
+    f"Total Q6 values: {len(q)}, "
+    f"NaN Q6 values: {np.isnan(q).sum()}")
+    
+    return q
+
+def pyscal_tetrahedrality(positions, box, method='cutoff', cutoff=3.5):
+    atoms = Atoms(symbols=["O"] * len(positions),positions=positions,cell=[box.Lx, box.Ly, box.Lz],pbc=True)
+    if method == 'cutoff':
+        pyscal.find_neighbors(atoms, method='cutoff', cutoff=cutoff)
+    elif method == 'voronoi':
+        pyscal.find_neighbors(atoms, method='voronoi')
+    tetrahedrality = pyscal.angular_criteria(atoms)
+    return tetrahedrality
+
+
+def calculate_cluster_param(tracked_particles, ids, parameter_list):
+    id_to_index = {
+        particle_id: i
+        for i, particle_id in enumerate(ids)
+    }
+    tracked_indices = [
+        id_to_index[particle_id]
+        for particle_id in tracked_particles
+        if particle_id in id_to_index
+    ]
+    cluster_values = parameter_list[tracked_indices]
+    if len(cluster_values) == 0:
+        return np.nan
+    valid_count = np.count_nonzero(~np.isnan(cluster_values))
+    if valid_count == 0:
+        print("WARNING: No valid values for this cluster!", flush=True)
+        return np.nan
+    return np.nanmean(cluster_values)
