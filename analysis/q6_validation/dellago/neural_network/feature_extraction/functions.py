@@ -16,19 +16,26 @@ from ase import Atoms
 
 
 def largest_cluster_info(dump, frame):
-    #returns largest cluster size n, num of IC IH, fraction of IC and IH
+    #returns largest cluster size n, num of IC IH, fraction of IC and IH, largest_cluster_radii
     pipeline = import_file(dump)
     pipeline.modifiers.append(ChillPlusModifier())
     pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
-    pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True))
+    pipeline.modifiers.append(ClusterAnalysisModifier(cutoff=3.5,only_selected=True,sort_by_size=True, compute_gyration=True,))
     
     data = pipeline.compute(frame)
     structure_types = np.asarray(data.particles["Structure Type"])
     cluster_ids = np.asarray(data.particles["Cluster"])
     timestep = int(data.attributes["Timestep"])
-    largest_cluster_id = int(data.attribute.get["ClusterAnalysis.largest_cluster"],0)
-    largest_cluster_size = int(data.attributes.get["ClusterAnalysis.largest_size"],0)
+   
+    clusters = data.particle_systems["clusters"]
+    cluster_sizes = np.asarray(clusters["Cluster Size"])
+    radii = np.asarray(clusters["Radius of Gyration"])
+    if len(cluster_sizes) == 0:
+        return None
 
+    largest_cluster_id = int(clusters["Cluster Identifier"][0])
+    largest_cluster_size = int(cluster_sizes[0])
+    largest_cluster_radius = float(radii[0])
 
     ids_in_largest = cluster_ids == largest_cluster_id
     ih = np.sum(structure_types[ids_in_largest] == 1)
@@ -36,7 +43,8 @@ def largest_cluster_info(dump, frame):
     ih_fraction = ih / largest_cluster_size
     ic_fraction = ic / largest_cluster_size
 
-    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction
+
+    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction, largest_cluster_radius
 
 
 def largest_q6_q4_tetra(dump, frame, ids_in_largest):
