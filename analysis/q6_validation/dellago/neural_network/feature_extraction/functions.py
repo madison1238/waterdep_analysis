@@ -89,6 +89,11 @@ def largest_vol_cn(dump,frame,ids_in_largest):
 
     return mean_cn, std_cn, mean_vol, std_vol
 
+def calculate_i_j_k(lamba1, lambda2, lambda3):
+    i = calculate_i_anisotropy(lamba1, lambda2, lambda3)
+    j = calculate_j_acylindricity(lamba1, lambda2, lambda3)
+    k = calculate_k_asphericity(lamba1, lambda2, lambda3)
+    return i,j,k
 
 
 
@@ -129,4 +134,11 @@ def calculate_eigenvalues(tensors):
     lambda1, lambda2, lambda3 = eigenvalues
     return lambda1, lambda2, lambda3
 
+def calculate_i_anisotropy(l1,l2,l3):
+    pass
 
+def calculate_j_acylindricity(l1,l2,l3):
+    pass
+
+def calculate_k_asphericity(l1,l2,l3):
+    pass
