@@ -15,6 +15,7 @@ from ase import Atoms
 
 
 
+
 def largest_cluster_info(dump, frame):
     #returns largest cluster size n, num of IC IH, fraction of IC and IH, largest_cluster_radii, lambda values
     pipeline = import_file(dump)
@@ -135,10 +136,10 @@ def calculate_eigenvalues(tensors):
     return lambda1, lambda2, lambda3
 
 def calculate_i_anisotropy(l1,l2,l3):
-    pass
+    return 3/2(l1+l2+l3/(l1+l2+l3)**2 - (1/3))
 
 def calculate_j_acylindricity(l1,l2,l3):
-    pass
+    return l2-l1
 
 def calculate_k_asphericity(l1,l2,l3):
-    pass
+    return l3 - (1/2)(l1+l2)
