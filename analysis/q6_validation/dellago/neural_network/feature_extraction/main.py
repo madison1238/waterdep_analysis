@@ -22,7 +22,7 @@ def main():
    with open(features_file, "w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow([
-      "dump path"
+      "dump path",
       "frame",
       "timestep",
       "Largest CLuster Size (n)",
@@ -85,3 +85,5 @@ def main():
     ])
 
 
+if __name__ == "__main__":
+    main()
