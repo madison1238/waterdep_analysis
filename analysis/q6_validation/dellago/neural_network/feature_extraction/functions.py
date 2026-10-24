@@ -48,7 +48,7 @@ def largest_cluster_info(dump, frame):
     ic_fraction = ic / largest_cluster_size
 
 
-    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction, largest_cluster_radius, lambda1, lambda2, lambda3
+    return timestep,largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction, largest_cluster_radius, lambda1, lambda2, lambda3
 
 
 def largest_q6_q4_tetra(dump, frame, ids_in_largest):
