@@ -16,7 +16,7 @@ from ase import Atoms
 
 
 def largest_cluster_info(dump, frame):
-    #returns largest cluster size n,all ids in systen, num of IC IH, fraction of IC and IH
+    #returns largest cluster size n, num of IC IH, fraction of IC and IH
     pipeline = import_file(dump)
     pipeline.modifiers.append(ChillPlusModifier())
     pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
@@ -36,7 +36,7 @@ def largest_cluster_info(dump, frame):
     ih_fraction = ih / largest_cluster_size
     ic_fraction = ic / largest_cluster_size
 
-    return largest_cluster_size, ids_in_largest, all_ids, ic, ih, ic_fraction, ih_fraction
+    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction
 
 
 def largest_q6_q4_tetra(dump, frame, ids_in_largest):
