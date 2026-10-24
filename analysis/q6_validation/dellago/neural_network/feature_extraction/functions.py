@@ -16,7 +16,7 @@ from ase import Atoms
 
 
 def largest_cluster_info(dump, frame):
-    #returns largest cluster size n, num of IC IH, fraction of IC and IH, largest_cluster_radii
+    #returns largest cluster size n, num of IC IH, fraction of IC and IH, largest_cluster_radii, lambda values
     pipeline = import_file(dump)
     pipeline.modifiers.append(ChillPlusModifier())
     pipeline.modifiers.append(ExpressionSelectionModifier(expression="StructureType == 1 || StructureType == 2"))
@@ -30,12 +30,15 @@ def largest_cluster_info(dump, frame):
     clusters = data.particle_systems["clusters"]
     cluster_sizes = np.asarray(clusters["Cluster Size"])
     radii = np.asarray(clusters["Radius of Gyration"])
+    gyration_tensors = np.asarray(clusters["Gyration Tensor"])
     if len(cluster_sizes) == 0:
         return None
 
     largest_cluster_id = int(clusters["Cluster Identifier"][0])
     largest_cluster_size = int(cluster_sizes[0])
     largest_cluster_radius = float(radii[0])
+    largest_cluster_tensors = gyration_tensors[0]
+    lambda1, lambda2, lambda3 = calculate_eigenvalues(largest_cluster_tensors)
 
     ids_in_largest = cluster_ids == largest_cluster_id
     ih = np.sum(structure_types[ids_in_largest] == 1)
@@ -44,7 +47,7 @@ def largest_cluster_info(dump, frame):
     ic_fraction = ic / largest_cluster_size
 
 
-    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction, largest_cluster_radius
+    return largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction, largest_cluster_radius, lambda1, lambda2, lambda3
 
 
 def largest_q6_q4_tetra(dump, frame, ids_in_largest):
@@ -113,5 +116,17 @@ def pyscal_tetrahedrality(positions, box, method='cutoff', cutoff=3.5):
         pyscal.find_neighbors(atoms, method='voronoi')
     tetrahedrality = pyscal.angular_criteria(atoms)
     return tetrahedrality
+
+def calculate_eigenvalues(tensors):
+    xx, yy, zz, xy, xz, yz = tensors
+    tensor_matrix = np.array([
+        [xx, xy, xz],
+        [xy, yy, yz],
+        [xz, yz, zz]
+    ])
+
+    eigenvalues = np.linalg.eigvalsh(tensor_matrix)
+    lambda1, lambda2, lambda3 = eigenvalues
+    return lambda1, lambda2, lambda3
 
 
