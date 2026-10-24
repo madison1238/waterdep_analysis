@@ -40,7 +40,7 @@ def largest_cluster_info(dump, frame):
     return largest_cluster_size, ids_in_largest, all_ids, ic, ih, ic_fraction, ih_fraction
 
 
-def largest_q6_q4_tetra(dump, frame, ids_in_largest, all_ids):
+def largest_q6_q4_tetra(dump, frame, ids_in_largest):
     pipeline = import_file(dump)
     data = pipeline.compute(frame)
     positions = np.asarray(data.particles["Position"])
@@ -54,13 +54,13 @@ def largest_q6_q4_tetra(dump, frame, ids_in_largest, all_ids):
     q4 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=4)
     tetra = pyscal_tetrahedrality(positions,box)
 
-    cluster_q6 = calculate_cluster_param(ids_in_largest, all_ids, q6)
-    cluster_q4 = calculate_cluster_param(ids_in_largest, all_ids, q4)
-    cluster_tetra = calculate_cluster_param(ids_in_largest, all_ids, tetra)
+    cluster_q6 = q6[ids_in_largest]
+    cluster_q4 = q4[ids_in_largest]
+    cluster_tetra = tetra[ids_in_largest]
 
     return cluster_q6, cluster_q4, cluster_tetra
 
-def largest_vol_cn(dump,frame,ids_in_largest,all_ids):
+def largest_vol_cn(dump,frame,ids_in_largest):
     pipeline = import_file(dump)
     voro = VoronoiAnalysisModifier(relative_face_threshold=0.02)
     pipeline.modifiers.append(voro)
@@ -78,8 +78,6 @@ def largest_vol_cn(dump,frame,ids_in_largest,all_ids):
     std_vol = np.std(cluster_vol)
 
     return mean_cn, std_cn, mean_vol, std_vol
-
-
 
 
 
