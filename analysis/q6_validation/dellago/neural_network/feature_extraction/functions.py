@@ -32,9 +32,6 @@ def largest_cluster_info(dump, frame):
     cluster_sizes = np.asarray(clusters["Cluster Size"])
     radii = np.asarray(clusters["Radius of Gyration"])
     gyration_tensors = np.asarray(clusters["Gyration Tensor"])
-    if len(cluster_sizes) == 0:
-        return None
-
     largest_cluster_id = int(clusters["Cluster Identifier"][0])
     largest_cluster_size = int(cluster_sizes[0])
     largest_cluster_radius = float(radii[0])
