@@ -144,11 +144,16 @@ def calculate_eigenvalues(tensors):
     lambda1, lambda2, lambda3 = eigenvalues
     return lambda1, lambda2, lambda3
 
-def calculate_i_anisotropy(l1,l2,l3):
-    return 3/2(l1+l2+l3/(l1+l2+l3)**2 - (1/3))
+def calculate_i_anisotropy(l1, l2, l3):
+    total = l1 + l2 + l3
+    if total <= 0:
+        raise ValueError("Eigenvalue sum must be positive.")
+    return (3 / 2) * ((l1**2 + l2**2 + l3**2) / total**2) - (1 / 3)
 
-def calculate_j_acylindricity(l1,l2,l3):
-    return l2-l1
 
-def calculate_k_asphericity(l1,l2,l3):
-    return l3 - (1/2)(l1+l2)
+def calculate_j_acylindricity(l1, l2, l3):
+    return l2 - l1
+
+
+def calculate_k_asphericity(l1, l2, l3):
+    return l3 - (l1 + l2) / 2
