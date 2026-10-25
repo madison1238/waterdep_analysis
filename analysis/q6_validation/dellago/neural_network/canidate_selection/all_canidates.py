@@ -64,8 +64,8 @@ with open(candidate_file, "w", newline="") as outfile:
                     total += 1
 
 print(f"Total eligible candidate frames: {total}")
-print(f"Total canidates in bin 10-19: f{bin_10_19}")
-print(f"Total canidates in bin 20-29: f{bin_20_29}")
-print(f"Total canidates in bin 30-39: f{bin_30_39}")
-print(f"Total canidates in bin 40-49: f{bin_40_49}")
-print(f"Total canidates in bin 50-60: f{bin_50_60}")
+print(f"Total canidates in bin 10-19: {bin_10_19}")
+print(f"Total canidates in bin 20-29: {bin_20_29}")
+print(f"Total canidates in bin 30-39: {bin_30_39}")
+print(f"Total canidates in bin 40-49: {bin_40_49}")
+print(f"Total canidates in bin 50-60: {bin_50_60}")
