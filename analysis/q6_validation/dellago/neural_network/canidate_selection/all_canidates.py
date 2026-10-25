@@ -5,6 +5,12 @@ sims = 300
 min_cluster_size = 10
 max_cluster_size = 60
 total = 0
+bin_10_19 = 0
+bin_20_29 = 0
+bin_30_39 = 0
+bin_40_49 = 0
+bin_50_60 = 0
+
 candidate_file = "all_candidates.csv"
 
 with open(candidate_file, "w", newline="") as outfile:
@@ -30,14 +36,19 @@ with open(candidate_file, "w", newline="") as outfile:
                 if min_cluster_size <= cluster_size <= max_cluster_size:
                     if cluster_size < 20:
                         size_bin = "10-19"
+                        bin_10_19 += 1
                     elif cluster_size < 30:
                         size_bin = "20-29"
+                        bin_20_29 += 1
                     elif cluster_size < 40:
                         size_bin = "30-39"
+                        bin_30_39 += 1
                     elif cluster_size < 50:
                         size_bin = "40-49"
+                        bin_40_49 += 1
                     else:
                         size_bin = "50-60"
+                        bin_50_60 += 1
                     frame = int(row["frame"])
                     timestep = int(row["timestep"])
 
@@ -53,3 +64,8 @@ with open(candidate_file, "w", newline="") as outfile:
                     total += 1
 
 print(f"Total eligible candidate frames: {total}")
+print(f"Total canidates in bin 10-19: f{bin_10_19}")
+print(f"Total canidates in bin 20-29: f{bin_20_29}")
+print(f"Total canidates in bin 30-39: f{bin_30_39}")
+print(f"Total canidates in bin 40-49: f{bin_40_49}")
+print(f"Total canidates in bin 50-60: f{bin_50_60}")
