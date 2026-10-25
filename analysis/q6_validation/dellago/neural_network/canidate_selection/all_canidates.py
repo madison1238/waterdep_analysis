@@ -15,7 +15,7 @@ candidate_file = "all_candidates.csv"
 
 with open(candidate_file, "w", newline="") as outfile:
     writer = None
-    for sim_num in range(sims):
+    for sim_num in range(1,sims):
         dump_file = f"../../sims/sim_{sim_num}/dump.mWC2.lammpstrj"
         ice_file = f"../../sims/sim_{sim_num}/summary/ice_clusters.csv"
         if not os.path.exists(ice_file):
