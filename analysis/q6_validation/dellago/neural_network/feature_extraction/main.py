@@ -9,8 +9,8 @@ import csv
 
 
 def main():
-   dump = ''
-   frame = 0
+   dump = '../dump.mWC2.lammpstrj'
+   frame = 2015
    features_file = 'features.csv'
 
    timestep, largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction,largest_cluster_radius, lambda1, lambda2, lambda3 = largest_cluster_info(dump,frame)
