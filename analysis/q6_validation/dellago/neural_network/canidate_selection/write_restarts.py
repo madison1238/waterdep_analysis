@@ -9,6 +9,8 @@ CSV_FILE = SCRIPT_DIR / "selected_configs.csv"
 OUTPUT_DIR = SCRIPT_DIR / "starting_configs"
 LAMMPS_INPUT = "in.template"
 MW_FILE = "mW.sw"
+LAMMPS_EXECUTABLE = "lmp_mpi"
+SBATCH_FILENAME = "sb.water"
 DUMP_PATH_BASE = SCRIPT_DIR
 
 
@@ -81,6 +83,8 @@ def prepare_configs():
                 config_dir = OUTPUT_DIR / config_name
                 original_input = sim_dir / LAMMPS_INPUT
                 original_mW = sim_dir / MW_FILE
+                original_lammps = sim_dir / LAMMPS_EXECUTABLE
+                original_sbatch = sim_dir / SBATCH_FILENAME
 
                 if not original_input.exists():
                     raise FileNotFoundError(
@@ -91,6 +95,15 @@ def prepare_configs():
                     raise FileNotFoundError(
                         f"mW potential file not found: {original_mW}"
                     )
+                if not original_lammps.exists():
+                    raise FileNotFoundError(
+                        f"LAMMPS executable not found: {original_lammps}"
+                    )
+
+                if not original_sbatch.exists():
+                    raise FileNotFoundError(
+                        f"SBATCH script not found: {original_sbatch}"
+                    )
 
                 input_text = original_input.read_text()
                 original_duration = get_original_duration(input_text)
@@ -100,6 +113,8 @@ def prepare_configs():
 
 
                 shutil.copy2(original_mW, config_dir)
+                shutil.copy2(original_lammps, config_dir)
+                shutil.copy2(original_sbatch, config_dir)
                 new_input = config_dir / LAMMPS_INPUT
                 new_input.write_text(modified_text)
 
