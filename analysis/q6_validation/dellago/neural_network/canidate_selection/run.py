@@ -6,20 +6,11 @@ from pathlib import Path
 import os
 
 
-# --------------------------------------------------
-# SETTINGS
-# --------------------------------------------------
-
 SCRIPT_DIR = Path(__file__).resolve().parent
 CONFIG_DIR = SCRIPT_DIR / "starting_configs"
-
 MAX_JOBS = 30
 CHECK_INTERVAL = 60  # seconds
 
-
-# --------------------------------------------------
-# HELPER FUNCTIONS
-# --------------------------------------------------
 
 def log(message):
     now = datetime.now().strftime("%H:%M:%S")
@@ -27,60 +18,46 @@ def log(message):
 
 
 def get_my_job_count():
-
     username = os.environ["USER"]
-
     result = subprocess.run(
         ["squeue", "-u", username, "-h"],
         capture_output=True,
         text=True,
     )
-
     if result.returncode != 0:
         log("Error checking queue:")
         log(result.stderr)
         return None
-
     jobs = result.stdout.strip().splitlines()
-
     return len(jobs)
 
 
 def submit_simulation(config_directory):
-
     config_name = config_directory.name
-
     command = ["sbatch", "sb.water"]
-
     result = subprocess.run(
         command,
         capture_output=True,
         text=True,
         cwd=config_directory
     )
-
     if result.returncode == 0:
         log(f"Submitted {config_name}")
         log(f"    {result.stdout.strip()}")
         return True
-
     else:
         log(f"ERROR submitting {config_name}")
         log(result.stderr.strip())
         return False
 
 
-# --------------------------------------------------
-# MAIN
-# --------------------------------------------------
+
 
 def main():
-
     log("=" * 50)
     log("Starting configuration job manager")
     log("=" * 50)
 
-    # Find all configuration directories
     config_directories = sorted(
         path for path in CONFIG_DIR.glob("config_*")
         if path.is_dir()
