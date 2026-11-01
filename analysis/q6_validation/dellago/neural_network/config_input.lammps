@@ -1,0 +1,24 @@
+variable seed equal 4732089
+variable temp equal 222
+variable nsteps equal 1000
+
+read_restart restart.config
+
+neighbor 4.0 bin
+neigh_modify every 1 check yes
+
+velocity all create ${temp} ${seed} mom yes dist gaussian
+
+fix 1 all npt temp ${temp} ${temp} 50 iso 0.986923 0.986923 500
+
+thermo 100
+thermo_style custom step temp press pe ke etotal density
+
+dump 1 all custom 200 dump1.lammpstrj id type x y z
+
+run ${nsteps}
+
+write_restart trial1.restart
+
+undump 1
+unfix 1
