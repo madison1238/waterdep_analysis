@@ -4,6 +4,9 @@ variable nsteps equal 1000
 
 read_restart restart.config
 
+pair_style sw
+pair_coeff * * mW.sw mW
+
 neighbor 4.0 bin
 neigh_modify every 1 check yes
 
