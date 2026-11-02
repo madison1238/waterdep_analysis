@@ -150,7 +150,7 @@ def prepare_folders():
             update_slurm_script(slurm, job_name)
 
 
-            input_file = single_trial / "in.config"
+            input_file = single_trial / "in.config_restart"
             create_input_script(input_file, random_seed)
             created += 1
 
