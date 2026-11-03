@@ -1,0 +1,25 @@
+variable temp equal 222
+variable nsteps equal 200
+
+read_restart chunk.restart
+
+pair_style sw
+pair_coeff * * mW.sw mW
+
+neighbor 4.0 bin
+neigh_modify every 1 check yes
+
+fix 1 all npt temp ${temp} ${temp} 50 iso 0.986923 0.986923 500
+
+thermo 100
+thermo_style custom step temp press pe ke etotal density
+
+dump 1 all custom 200 dump.chunk.lammpstrj id type x y z
+dump_modify 1 sort id
+
+run ${nsteps}
+
+write_restart chunk.restart
+
+undump 1
+unfix 1
