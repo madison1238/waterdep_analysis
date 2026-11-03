@@ -1,6 +1,6 @@
 variable seed equal SEED1
 variable temp equal 222
-variable nsteps equal 1000
+variable nsteps equal 200
 
 read_restart restart.config
 
