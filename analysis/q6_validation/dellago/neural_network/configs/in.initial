@@ -1,6 +1,5 @@
 variable seed equal SEED1
 variable temp equal 222
-variable nsteps equal 200
 
 read_restart restart.config
 
@@ -10,18 +9,16 @@ pair_coeff * * mW.sw mW
 neighbor 4.0 bin
 neigh_modify every 1 check yes
 
-velocity all create ${temp} ${seed} mom yes dist gaussian
+velocity all create ${temp} ${seed} mom yes rot yes dist gaussian
+
 fix 1 all npt temp ${temp} ${temp} 50 iso 0.986923 0.986923 500
 
 thermo 100
 thermo_style custom step temp press pe ke etotal density
 
-dump 1 all custom 100 dump.chunk.lammpstrj id type x y z
-dump_modify 1 sort id
-
+dump 1 all custom ${dump_interval} ${dumpfile} id type x y z
 run ${nsteps}
-
-write_restart chunk.restart
+write_restart chunk.next.restart
 
 undump 1
 unfix 1
