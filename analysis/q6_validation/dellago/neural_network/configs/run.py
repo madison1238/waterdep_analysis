@@ -115,10 +115,10 @@ def main():
 
                 trial_directory = trial_directories[next_trial]
 
-                controller = trial_directory / "sbatch.controller"
+                controller = trial_directory / "sb.controller"
 
                 if not controller.exists():
-                    log(f"ERROR: sbatch.controller not found in {trial_directory}")
+                    log(f"ERROR: sb.controller not found in {trial_directory}")
                     next_trial += 1
                     continue
 
