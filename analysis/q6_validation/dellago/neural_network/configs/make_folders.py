@@ -55,6 +55,18 @@ def update_slurm_script(slurm_path, job_name):
     with open(slurm_path, "w") as f:
         f.write(slurm_text)
 
+def update_controller(path, job_name):
+    with open(path, "r") as f:
+        controller_text = f.read()
+    controller_text = re.sub(
+        r"\bNAME\b",
+        f"control_{job_name}",
+        controller_text
+        )
+    
+    with open(path, "w") as f:
+        f.write(controller_text)
+
 def prepare_folders():
 
     selected_rows = []
@@ -145,9 +157,13 @@ def prepare_folders():
             seed_index += 1
 
 
-            slurm = single_trial / "sb.water"
+            slurm_start = single_trial / "sb.start" 
+            slurm_continue = single_trial / "sb.contiue"
+            controller = single_trial / "controller.py"
             job_name = f"config_{config['row_number']:03d}_t_{i+1}"
-            update_slurm_script(slurm, job_name)
+            update_slurm_script(slurm_start, job_name)
+            update_slurm_script(slurm_continue, job_name)
+            update_controller(controller,job_name)
 
 
             input_file = single_trial / "in.config_restart"
