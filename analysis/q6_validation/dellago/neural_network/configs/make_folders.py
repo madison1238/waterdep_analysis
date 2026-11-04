@@ -157,7 +157,7 @@ def prepare_folders():
             seed_index += 1
 
 
-            slurm_start = single_trial / "sb.start" 
+            slurm_start = single_trial / "sb.first" 
             slurm_continue = single_trial / "sb.contiue"
             controller = single_trial / "controller.py"
             job_name = f"config_{config['row_number']:03d}_t_{i+1}"
