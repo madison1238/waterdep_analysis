@@ -158,7 +158,7 @@ def prepare_folders():
 
 
             slurm_start = single_trial / "sb.first" 
-            slurm_continue = single_trial / "sb.contiue"
+            slurm_continue = single_trial / "sb.continue"
             controller = single_trial / "controller.py"
             job_name = f"config_{config['row_number']:03d}_t_{i+1}"
             update_slurm_script(slurm_start, job_name)
