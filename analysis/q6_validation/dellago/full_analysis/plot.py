@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 def plot_MFPT_v_n(save_file):
     n_values = []
     mfpt_values = []
+    plt.rcParams.update({'font.size': 12})
     with open("../summary/MFPT.csv", "r", newline="") as file:
         reader = csv.DictReader(file)
         for row in reader:

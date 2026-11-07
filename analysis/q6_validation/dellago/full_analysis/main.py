@@ -1,88 +1,68 @@
-from ovito.io import import_file
-from ovito.modifiers import VoronoiAnalysisModifier
-from ase import Atoms
-import pyscal
-import numpy as np
+import functions
+from plot import * 
 import csv
+import os
 
+sims = 300
+sim_files = [f"../sim/sim_{i+1}/summary/ice_clusters.csv" for i in range(sims) ]
+min_n = 5
+max_n = 60
+timestep_inteveral = 5
 
-filename = "../sims/sim_1/dump.mWC2.lammpstrj"
+all_first_passages = []
+for file_name in sim_files:
+    print(f"Processing {file_name}")
+    first_passage = functions.get_first_passage_times(file_name, min_n,max_n)
+    all_first_passages.append(first_passage)
 
-#OVITO
-pipeline = import_file(filename)
-frame = pipeline.source.num_frames - 1
-data = pipeline.compute(frame)
-ids = np.asarray(data.particles["Particle Identifier"])
-positions = np.asarray(data.particles["Position"])
-cell = np.asarray(data.cell.matrix)
-box_lengths = [
-    cell[0, 0],
-    cell[1, 1],
-    cell[2, 2]
-]
-print("Atoms:", len(ids))
-print("Frame:", frame)
-print("Box:", box_lengths)
+mfpt = {}
+for n in range(min_n, max_n+1):
+    times = []
+    for sim in all_first_passages:
+        timestep = sim[n]
+        if timestep is not None:
+            times.append(timestep)
+    if len(times) > 0:
+        mean_timestep = sum(times) / len(times)
+        mean_ps = mean_timestep * timestep_inteveral * 1e-3
+        mfpt[n] = mean_ps
 
+    else:
+        mfpt[n] = None
 
-pipeline.modifiers.append(VoronoiAnalysisModifier(relative_face_threshold=0.02))
-data = pipeline.compute(frame)
-ovito_cn = np.asarray(data.particles["Coordination"])
-print("\nOVITO CN:")
-print("Mean:", np.mean(ovito_cn))
-print("Min:", np.min(ovito_cn))
-print("Max:", np.max(ovito_cn))
+output_folder = '../summary'
+os.makedirs(output_folder,exist_ok=True)
+with open(f"{output_folder}/MFPT.csv", 'w', newline="") as file:
+    writer = csv.writer(file)
 
-
-#PYSCAL
-atoms = Atoms(
-    symbols=["O"] * len(positions),
-    positions=positions,
-    cell=box_lengths,
-    pbc=True
-)
-
-
-pyscal.find_neighbors(atoms,method="voronoi")
-pyscal_cn = np.asarray(pyscal.coordination_number(atoms))
-print("\nPyscal CN:")
-print("Mean:", np.mean(pyscal_cn))
-print("Min:", np.min(pyscal_cn))
-print("Max:", np.max(pyscal_cn))
-
-difference = pyscal_cn - ovito_cn
-
-print("\nComparison:")
-print("Mean difference:", np.mean(difference))
-print("Mean absolute difference:", np.mean(np.abs(difference)))
-print("Maximum absolute difference:", np.max(np.abs(difference)))
-print(
-    "Atoms with different CN:",
-    np.sum(difference != 0)
-)
-
-
-
-with open("../summary/pyscal_vs_ovito_cn.csv", "w", newline="") as f:
-    writer = csv.writer(f)
     writer.writerow([
-        "Atom_ID",
-        "Pyscal_CN",
-        "OVITO_CN",
-        "Difference"
+        "n",
+        "sim1_ps",
+        "sim2_ps",
+        "sim3_ps",
+        "sim4_ps",
+        "sim5_ps",
+        "MFPT_ps"
     ])
-    for atom_id, p_cn, o_cn, diff in zip(
-        ids,
-        pyscal_cn,
-        ovito_cn,
-        difference
-    ):
-        writer.writerow([
-            atom_id,
-            p_cn,
-            o_cn,
-            diff
-        ])
-print("\nSaved: pyscal_vs_ovito_cn.csv")
+
+    for n in range(min_n,max_n+1):
+        row = [n]
+        for sim in all_first_passages:
+            timestep = sim[n]
+            if timestep is not None:
+                time_ps = timestep * timestep_inteveral * 1e-3
+                row.append(time_ps)
+            else:
+                row.append("")
+        row.append(mfpt[n])
+        writer.writerow(row)
+
+
+
+print("\nMFPT Plot Coordinates (x, y):")
+for n in range(min_n, max_n + 1):
+    if mfpt[n] is not None:
+        print(f"({n}, {mfpt[n]:.6f})")
+plot_MFPT_v_n(f"../summary/MFPT_vs_n.png")
 
 
