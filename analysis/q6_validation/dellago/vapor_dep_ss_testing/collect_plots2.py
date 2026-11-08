@@ -32,6 +32,7 @@ def plot_largest_vs_time(ss_ratio, save):
         plt.plot(
             time_ps,
             largest_cluster,
+            alpha=0.9,
             label=f"{temp} K"
         )
     plt.xlabel("Time (ps)", fontsize=12)
