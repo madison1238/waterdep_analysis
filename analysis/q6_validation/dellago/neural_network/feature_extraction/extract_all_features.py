@@ -26,7 +26,7 @@ print("Starting feature extraction...\n", flush=True)
 with INITIAL_FEATURES_PATH.open("w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow([
-      "config_id"
+      "config_id",
       "dump path",
       "frame",
       "timestep",
