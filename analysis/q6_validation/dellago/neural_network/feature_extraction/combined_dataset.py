@@ -39,7 +39,6 @@ with open(simulation_outcomes_file, "r", newline="") as file:
         combined_rows.append(combined_row)
 
 
-# Validate and write combined dataset
 if missing_configs:
     raise ValueError(
         f"Missing initial features for configurations: {sorted(missing_configs)}"
