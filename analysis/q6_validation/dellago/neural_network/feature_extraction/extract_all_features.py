@@ -26,6 +26,7 @@ print("Starting feature extraction...\n", flush=True)
 with INITIAL_FEATURES_PATH.open("w", newline="") as f:
     writer = csv.writer(f)
     writer.writerow([
+      "config_id"
       "dump path",
       "frame",
       "timestep",
@@ -57,7 +58,7 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
       "E6"
     ])
     for index, row in enumerate(candidates, start=1):
-
+        config_id = f"config_{index:03d}"
         row["Frame"] = int(row["Frame"])
         row["Timestep"] = int(row["Timestep"])
         row["Largest Cluster Size (n)"] = int(row["Largest Cluster Size (n)"])
@@ -77,6 +78,7 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
             E1,E2,E3,E4,E5,E6= caluculate_E_1_6(largest_cluster_size, cluster_q6,k, largest_cluster_radius, cluster_v_vol, std_v_vol, cluster_cn, std_cn )
 
             writer.writerow([
+                config_id,
                 dump_path,
                 frame,
                 timestep,
@@ -113,7 +115,7 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
             failed += 1
             print(f"FAILED: {dump_path}, frame {frame}", flush=True)
             print(f"Error: {error}\n", flush=True)
-            
+
 print("\nFeature extraction complete! :D", flush=True)
 print(f"Total configurations: {total_configs}", flush=True)
 print(f"Successfully written: {successful}", flush=True)
