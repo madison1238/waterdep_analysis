@@ -185,15 +185,15 @@ def main():
     timestep = 5
 
     #target ss ratio
-    s = 100000
+    s = 250000
     #number of atoms
     nW = 52000
 
     base_density = g_m3_to_molecule_A3(0.002)
     target_density = base_density * s
 
-    box_volume = nW / target_density
-    box_length = box_volume ** (1/3)
+    box_length = 729.92621 * 2
+    box_volume = box_length ** 3
 
     print(f"S: {s}", flush=True)
     print(f"Starting atoms: {nW}", flush=True)
@@ -202,29 +202,38 @@ def main():
     print(f"Box volume: {box_volume:.8e} A^3", flush=True)
     print(f"Box length: {box_length:.2f} A", flush=True)
 
-    cycles = 20
+    cycles = 80
+    start_cycle = 65
     start_temp = 200
     end_temp = 200
-    total_steps = 1000000
+    total_steps = 20000000
     all_vapor_density_g_m3 = []
-    vapor_molecules = nW
-    free_volume = box_length ** 3
+    #vapor_molecules = nW uncomment later
+    #free_volume = box_length ** 3 uncomment later
 
     all_timesteps = []
 
     density_log = "density_log.txt"
     cluster_log = "cluster_info.txt"
 
-   
+    #ONLY USE THIS FOR RESTARTING
+    start_dump = f"dumps/dump.{start_cycle - 1}.lammpstrj"
+    (
+        vapor_molecules,
+        condensed_molecules,
+        vapor_density,
+        free_volume
+    ) = cluster_info(start_dump, cluster_log, box_length)
+
     os.makedirs("restarts", exist_ok=True)
     os.makedirs("outputs", exist_ok=True)
     os.makedirs("dumps", exist_ok=True)
-    for cycle in range(cycles):
+    for cycle in range(start_cycle,cycles): 
         filename = f"dumps/dump.{cycle}.lammpstrj"
         if os.path.exists(filename):
             os.remove(filename)
 
-    with open("in.stable_template", 'r') as stable:
+    '''with open("in.stable_template", 'r') as stable:
         stable_file = stable.read()
     stable_file = stable_file.replace("TEMP", str(start_temp))
     stable_file = stable_file.replace("NW", str(nW))
@@ -236,10 +245,10 @@ def main():
 
 
     stable_id = submit_job('sb.stable')
-    wait_for_job(stable_id)
+    wait_for_job(stable_id)'''
 
     
-    with open(density_log, 'w') as log:
+    with open(density_log, 'a') as log:
         log.write("DENSITY LOG FILE\n")
         log.write("===================\n\n")
     
@@ -247,7 +256,7 @@ def main():
         log.write("CLUSTER LOG FILE\n")
         log.write("===================\n\n")'''
 
-    for cycle in range(cycles):
+    for cycle in range(start_cycle,cycles):
         with open("in.template", 'r') as f:
             template = f.read()
 
