@@ -38,6 +38,34 @@ feature_order = [
     "Asphericity (K)"
 ]
 
+label_map = {
+    "nih": r"$n_{Ih}$",
+    "Largest Cluster Size (n)": r"$n$",
+    "E1": r"$\varepsilon_1$",
+    "Radius of Gyration (Rg)": r"$R_g$",
+    "nic": r"$n_{Ic}$",
+    "E2": r"$\varepsilon_2$",
+    "E4": r"$\varepsilon_4$",
+    "E5": r"$\varepsilon_5$",
+    "Anisotropy (I)": r"$I$",
+    "CN Standard Deviation": r"$C_{\sigma}$",
+    "E3": r"$\varepsilon_3$",
+    "nic/n": r"$n_{Ic}/n$",
+    "Voronoi Volume Standard Deviation": r"$V_{\sigma}$",
+    "Q4": r"$Q_4$",
+    "Q6": r"$Q_6$",
+    "E6": r"$\varepsilon_6$",
+    "Voronoi Volume": r"$V_{m}$",
+    "Coordination Number (CN)": r"$C_{m}$",
+    "nih/n": r"$n_{Ih}/n$",
+    "Tetrahedrality": r"$\Theta$",
+    "Acylindricity (J)": r"$J$",
+    "Asphericity (K)": r"$K$"
+}
+
+
+
+
 custom_cmap = LinearSegmentedColormap.from_list(
     "custom_correlation",
     [
@@ -74,6 +102,47 @@ def pearson(x, y):
     return numerator / denominator
 
 
+def create_correlation_plot(show_values, filename):
+    fig, ax = plt.subplots(figsize=(17, 14))
+    heatmap = ax.imshow(
+        correlation_matrix,
+        cmap=custom_cmap,
+        vmin=-1,
+        vmax=1,
+        aspect="auto"
+    )
+
+    ax.set_xticks(range(num_features))
+    ax.set_yticks(range(num_features))
+
+    display_labels = [label_map[feature] for feature in feature_columns]
+
+    ax.set_xticklabels(display_labels, rotation=90, fontsize=30, weight='bold')
+    ax.set_yticklabels(display_labels, fontsize=30, weight='bold')
+
+    if show_values:
+        for i in range(num_features):
+            for j in range(num_features):
+                value = correlation_matrix[i][j]
+
+                ax.text(
+                    j, i,
+                    f"{value:.2f}",
+                    ha="center",
+                    va="center",
+                    fontsize=6
+                )
+
+    colorbar = fig.colorbar(heatmap, ax=ax)
+    colorbar.set_label("Correlation",fontsize=40)
+    colorbar.ax.tick_params(labelsize=20)
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300)
+    plt.show()
+
+    plt.close(fig)
+
+
 
 
 data = {}
@@ -104,37 +173,12 @@ for feature1 in feature_columns:
     correlation_matrix.append(row)
 
 
-fig, ax = plt.subplots(figsize=(17, 14))
-heatmap = ax.imshow(
-    correlation_matrix,
-    cmap=custom_cmap,
-    vmin=-1,
-    vmax=1,
-    aspect="auto"
+create_correlation_plot(
+    show_values=True,
+    filename="pearson_correlation_matrix_labeled.png"
 )
 
-
-
-ax.set_xticks(range(num_features))
-ax.set_yticks(range(num_features))
-
-ax.set_xticklabels(feature_columns, rotation=90, fontsize=9)
-ax.set_yticklabels(feature_columns, fontsize=9)
-
-for i in range(num_features):
-    for j in range(num_features):
-        value = correlation_matrix[i][j]
-        ax.text(
-            j, i,
-            f"{value:.2f}",
-            ha="center",
-            va="center",
-            fontsize=6
-        )
-
-colorbar = fig.colorbar(heatmap, ax=ax)
-colorbar.set_label("Pearson Correlation Coefficient", fontsize=11)
-ax.set_title("Pearson Correlation Matrix", fontsize=16, pad=15)
-plt.tight_layout()
-plt.savefig("pearson_correlation_matrix.png", dpi=300)
-plt.show()
+create_correlation_plot(
+    show_values=False,
+    filename="pearson_correlation_matrix_unlabeled.png"
+)
