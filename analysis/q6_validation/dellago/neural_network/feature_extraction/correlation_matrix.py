@@ -1,6 +1,8 @@
 import csv
 import math
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+
 
 training_file = "train.csv"
 
@@ -35,6 +37,12 @@ feature_order = [
     "Acylindricity (J)",
     "Asphericity (K)"
 ]
+
+custom_cmap = LinearSegmentedColormap.from_list(
+    "custom_correlation",
+    ["#042F5D", "#FFFFFF", "#6C0120"]
+)
+
 
 def pearson(x, y):
     mean_x = sum(x) / len(x)
@@ -87,11 +95,13 @@ for feature1 in feature_columns:
 fig, ax = plt.subplots(figsize=(17, 14))
 heatmap = ax.imshow(
     correlation_matrix,
-    cmap="coolwarm",
+    cmap=custom_cmap,
     vmin=-1,
     vmax=1,
     aspect="auto"
 )
+
+
 
 ax.set_xticks(range(num_features))
 ax.set_yticks(range(num_features))
