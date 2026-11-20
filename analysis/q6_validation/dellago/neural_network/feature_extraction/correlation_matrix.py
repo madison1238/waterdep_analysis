@@ -2,7 +2,7 @@ import csv
 import math
 import matplotlib.pyplot as plt
 
-training_file = "training.csv"
+training_file = "train.csv"
 
 excluded_columns = {
     "config_id",
@@ -11,19 +11,30 @@ excluded_columns = {
     "label"
 }
 
-data = {}
-
-with open(training_file, "r", newline="") as file:
-    reader = csv.DictReader(file)
-    feature_columns = [
-        column for column in reader.fieldnames
-        if column not in excluded_columns
-    ]
-    data = {column: [] for column in feature_columns}
-    for row in reader:
-        for column in feature_columns:
-            data[column].append(float(row[column]))
-
+feature_order = [
+    "nih",
+    "Largest Cluster Size (n)",
+    "E1",
+    "Radius of Gyration (Rg)",
+    "nic",
+    "E2",
+    "E4",
+    "E5",
+    "Anisotropy (I)",
+    "CN Standard Deviation",
+    "E3",
+    "nic/n",
+    "Voronoi Volume Standard Deviation",
+    "Q4",
+    "Q6",
+    "E6",
+    "Voronoi Volume",
+    "Coordination Number (CN)",
+    "nih/n",
+    "Tetrahedrality",
+    "Acylindricity (J)",
+    "Asphericity (K)"
+]
 
 def pearson(x, y):
     mean_x = sum(x) / len(x)
@@ -42,6 +53,27 @@ def pearson(x, y):
         return float("nan")
     return numerator / denominator
 
+
+
+
+data = {}
+
+with open(training_file, "r", newline="") as file:
+    reader = csv.DictReader(file)
+    feature_columns = [
+        column for column in reader.fieldnames
+        if column not in excluded_columns
+    ]
+    data = {column: [] for column in feature_columns}
+    for row in reader:
+        for column in feature_columns:
+            data[column].append(float(row[column]))
+
+missing = [feature for feature in feature_order if feature not in data]
+if missing:
+    raise ValueError(f"Missing columns: {missing}")
+
+feature_columns = feature_order
 num_features = len(feature_columns)
 correlation_matrix = []
 for feature1 in feature_columns:
