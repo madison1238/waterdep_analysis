@@ -34,6 +34,9 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
       "Size Bin",
       "Q6",
       "Q4",
+      "q6",
+      "q4",
+      "All Tetrahedrality"
       "Tetrahedrality",
       "nih",
       "nic",
@@ -44,9 +47,6 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
       'Voronoi Volume',
       "Voronoi Volume Standard Deviation",
       "Radius of Gyration (Rg)",
-      "lambda 1",
-      "lambda 2",
-      "lambda 3",
       "Anisotropy (I)",
       "Acylindricity (J)",
       "Asphericity (K)",
@@ -72,7 +72,7 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
 
         try:
             timestep, largest_cluster_size, ids_in_largest, ic, ih, ic_fraction, ih_fraction,largest_cluster_radius, lambda1, lambda2, lambda3 = largest_cluster_info(dump_path,frame)
-            cluster_q6, cluster_q4, cluster_tetra, = largest_q6_q4_tetra(dump_path, frame, ids_in_largest)
+            cluster_q6, cluster_q4, cluster_tetra, local_q6, local_q4, all_tetra = largest_q6_q4_tetra(dump_path, frame, ids_in_largest)
             cluster_cn, std_cn, cluster_v_vol, std_v_vol =  largest_vol_cn(dump_path, frame, ids_in_largest)
             i,j,k = calculate_i_j_k(lambda1,lambda2,lambda3)
             E1,E2,E3,E4,E5,E6= caluculate_E_1_6(largest_cluster_size, cluster_q6,k, largest_cluster_radius, cluster_v_vol, std_v_vol, cluster_cn, std_cn )
@@ -86,6 +86,9 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
                 size_bin,
                 cluster_q6,
                 cluster_q4,
+                local_q6,
+                local_q4,
+                all_tetra,
                 cluster_tetra,
                 ih,
                 ic,
@@ -96,9 +99,6 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
                 cluster_v_vol,
                 std_v_vol,
                 largest_cluster_radius,
-                lambda1,
-                lambda2,
-                lambda3,
                 i,
                 j,
                 k,
