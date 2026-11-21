@@ -61,6 +61,10 @@ def largest_q6_q4_tetra(dump, frame, ids_in_largest):
     q4 = pyscal_steinhardt(positions,box, method='cutoff',averaged=True,cutoff=3.5,param=4)
     tetra = pyscal_tetrahedrality(positions,box)
 
+    local_q6 = np.mean(q6)
+    local_q4 = np.mean(q4)
+    local_tetra = np.mean(tetra)
+
     cluster_q6 = q6[ids_in_largest]
     cluster_q4 = q4[ids_in_largest]
     cluster_tetra = tetra[ids_in_largest]
@@ -68,7 +72,10 @@ def largest_q6_q4_tetra(dump, frame, ids_in_largest):
     return (
         float(np.mean(cluster_q6)),
         float(np.mean(cluster_q4)),
-        float(np.mean(cluster_tetra))
+        float(np.mean(cluster_tetra)),
+        float(local_q6),
+        float(local_q4),
+        float(local_tetra)
     )
 
 def largest_vol_cn(dump,frame,ids_in_largest):
