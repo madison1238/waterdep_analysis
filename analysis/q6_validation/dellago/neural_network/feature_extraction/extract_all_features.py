@@ -36,7 +36,7 @@ with INITIAL_FEATURES_PATH.open("w", newline="") as f:
       "Q4",
       "q6",
       "q4",
-      "All Tetrahedrality"
+      "All Tetrahedrality",
       "Tetrahedrality",
       "nih",
       "nic",
