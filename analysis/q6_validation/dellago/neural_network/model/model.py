@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class NucleationMLP(nn.Module):
-    def __init__(self, input_features=23):
+    def __init__(self, input_features=22):
         super().__init__()
         self.network = nn.Sequential(
 

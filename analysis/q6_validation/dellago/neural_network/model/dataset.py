@@ -48,9 +48,9 @@ def load_datasets():
     with open(scaling_path, "r") as file:
         scaling_data = json.load(file)
     feature_columns = scaling_data["feature_columns"]
-    if len(feature_columns) != 23:
+    if len(feature_columns) != 22:
         raise ValueError(
-            f"Expected 23 features, but found {len(feature_columns)}"
+            f"Expected 22 features, but found {len(feature_columns)}"
         )
     train_dataset = load_features("train.csv", feature_columns)
     validation_dataset = load_features("validation.csv", feature_columns)
