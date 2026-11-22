@@ -71,13 +71,13 @@ def validate(model, validation_loader, device):
 
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
+    print(f"Using device: {device}",flush=True)
 
     train_loader, validation_loader, test_loader, feature_columns = (load_datasets())
 
-    print(f"Number of features: {len(feature_columns)}")
-    print(f"Training samples: {len(train_loader.dataset)}")
-    print(f"Validation samples: {len(validation_loader.dataset)}")
+    print(f"Number of features: {len(feature_columns)}",flush=True)
+    print(f"Training samples: {len(train_loader.dataset)}",flush=True)
+    print(f"Validation samples: {len(validation_loader.dataset)}",flush=True)
 
     model = NucleationMLP(input_features=len(feature_columns)).to(device)
 
@@ -86,7 +86,7 @@ def main():
 
     best_validation_loss = float("inf")
     model_path = MODEL_DIR / "best_model.pt"
-    print("\nStarting training...\n")
+    print("\nStarting training...\n",flush=True)
 
     for epoch in range(EPOCHS):
 
@@ -97,10 +97,11 @@ def main():
         current_lr = optimizer.param_groups[0]["lr"]
 
         print(
-            f"Epoch [{epoch + 1}/{EPOCHS}] "
+            f"Epoch [{epoch + 1}/{EPOCHS}]"
             f"Training Loss: {training_loss:.6f} "
             f"Validation Loss: {validation_loss:.6f} "
-            f"LR: {current_lr:.7f}"
+            f"LR: {current_lr:.7f}",
+            flush=True
         )
 
         if validation_loss < best_validation_loss:
@@ -115,7 +116,7 @@ def main():
                 model_path
             )
 
-            print("  Saved new best model!")
+            print("  Saved new best model!",flush=True)
         scheduler.step()
 
     print("\nTraining complete!")
