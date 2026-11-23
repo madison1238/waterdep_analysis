@@ -1,7 +1,8 @@
-
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
+import csv
+import matplotlib.pyplot as plt
 
 from pathlib import Path
 
@@ -18,9 +19,79 @@ torch.manual_seed(42)
 MODEL_DIR = Path(__file__).resolve().parent / "models"
 MODEL_DIR.mkdir(exist_ok=True)
 
+RESULTS_DIR = Path(__file__).resolve().parent / "results"
+RESULTS_DIR.mkdir(exist_ok=True)
+
+
+def save_training_history(training_losses, validation_losses, learning_rates):
+    csv_path = RESULTS_DIR / "training_history.csv"
+    with open(csv_path, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([
+            "Epoch",
+            "Training Loss",
+            "Validation Loss",
+            "Learning Rate"
+        ])
+        for epoch in range(len(training_losses)):
+            writer.writerow([
+                epoch + 1,
+                training_losses[epoch],
+                validation_losses[epoch],
+                learning_rates[epoch]
+            ])
+    print(f"\nTraining history saved to: {csv_path}")
+
+def plot_training_history(training_losses, validation_losses, learning_rates):
+
+    epochs = range(1, len(training_losses) + 1)
+    # Plot 1
+    plt.figure(figsize=(10, 6))
+    plt.plot(epochs, training_losses, label="Training Loss")
+    plt.plot(epochs, validation_losses, label="Validation Loss")
+    best_epoch = validation_losses.index(min(validation_losses)) + 1
+    best_loss = min(validation_losses)
+    plt.scatter(
+        best_epoch,
+        best_loss,
+        marker="o",
+        s=70,
+        label=f"Best Validation Loss (Epoch {best_epoch})"
+    )
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training and Validation Loss")
+    plt.legend()
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+
+    loss_path = RESULTS_DIR / "loss_curves.png"
+    plt.savefig(loss_path, dpi=300)
+    plt.show()
+    plt.close()
+
+    # plot 2
+    plt.figure(figsize=(10, 6))
+
+    plt.plot(epochs, learning_rates)
+
+    plt.xlabel("Epoch")
+    plt.ylabel("Learning Rate")
+    plt.title("Cosine Annealing Learning Rate Schedule")
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+
+    lr_path = RESULTS_DIR / "learning_rate.png"
+    plt.savefig(lr_path, dpi=300)
+    plt.show()
+    plt.close()
+
+    print(f"\nLoss plot saved to: {loss_path}")
+    print(f"Learning rate plot saved to: {lr_path}")
+
 def calculate_loss(predictions, labels):
     loss = F.softplus(-labels * predictions)
-    return loss.sum()
+    return loss.mean()
 
 def train_one_epoch(model, train_loader, optimizer, device):
     model.train()
@@ -70,6 +141,9 @@ def validate(model, validation_loader, device):
 
 
 def main():
+    training_losses = []
+    validation_losses = []
+    learning_rates = []
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}",flush=True)
 
@@ -91,10 +165,11 @@ def main():
     for epoch in range(EPOCHS):
 
         training_loss = train_one_epoch(model,train_loader,optimizer,device)
-
         validation_loss = validate( model,validation_loader,device)
-
         current_lr = optimizer.param_groups[0]["lr"]
+        training_losses.append(training_loss)
+        validation_losses.append(validation_loss)
+        learning_rates.append(current_lr)
 
         print(
             f"Epoch [{epoch + 1}/{EPOCHS}]"
@@ -122,6 +197,8 @@ def main():
     print("\nTraining complete!")
     print(f"Best validation loss: {best_validation_loss:.6f}")
     print(f"Best model saved to: {model_path}")
+    save_training_history(training_losses,validation_losses,learning_rates)
+    plot_training_history( training_losses,validation_losses,learning_rates)
 
 
 if __name__ == "__main__":
