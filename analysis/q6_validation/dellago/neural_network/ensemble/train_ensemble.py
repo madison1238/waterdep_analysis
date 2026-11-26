@@ -5,6 +5,8 @@ from pathlib import Path
 import numpy as np
 import torch
 import torch.optim as optim
+import matplotlib.pyplot as plt
+
 
 from model import NucleationMLP
 from dataset import load_datasets
@@ -107,26 +109,93 @@ def train_model(model_number, seed):
                 validation_losses[epoch],
                 learning_rates[epoch]
             ])
+    plot_model_history(model_number,training_losses,validation_losses)
+
     print(f"\nModel {model_number} complete!")
     print(f"Best validation loss: {best_validation_loss:.6f}")
     print(f"Saved to: {model_path}")
-    return {
+    return (
+    {
         "Model": model_number,
         "Seed": seed,
         "Best Validation Loss": best_validation_loss,
         "Best Model Path": str(model_path)
+    },
+    {
+        "Model": model_number,
+        "Training Losses": training_losses,
+        "Validation Losses": validation_losses
     }
+)
+
+
+def plot_model_history(model_number,training_losses,validation_losses):
+
+    epochs = range(1, len(training_losses) + 1)
+    plt.figure(figsize=(10, 6))
+    plt.plot(epochs,training_losses,label="Training Loss")
+
+    plt.plot(epochs,validation_losses,linestyle=":",label="Validation Loss")
+
+    best_epoch = validation_losses.index( min(validation_losses)) + 1
+    best_loss = min(validation_losses)
+
+    plt.scatter(best_epoch,best_loss,marker="o",s=70,label=f"Best Validation Loss (Epoch {best_epoch})")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title(f"Model {model_number} Training and Validation Loss")
+
+    plt.legend()
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+    plot_path = (RESULTS_DIR /"model_losses"/ f"model_{model_number:02d}_loss.png")
+    plt.savefig(plot_path, dpi=300)
+    plt.close()
+    print(f"Saved Model {model_number} loss plot: {plot_path}")
+
+
+def plot_all_model_histories(all_histories):
+    plt.figure(figsize=(14, 8))
+    colors = plt.get_cmap("tab10").colors
+    for i, history in enumerate(all_histories):
+        model_number = history["Model"]
+        training_losses = history["Training Losses"]
+        validation_losses = history["Validation Losses"]
+        epochs = range(1, len(training_losses) + 1)
+        color = colors[i % len(colors)]
+
+        plt.plot(epochs,training_losses,color=color,linestyle="-",linewidth=1.8,label=f"Model {model_number} Training")
+        plt.plot(epochs,validation_losses,color=color,linestyle=":",linewidth=1.8,label=f"Model {model_number} Validation")
+
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
+    plt.title("Training and Validation Loss - All 10 Models")
+
+    plt.legend(bbox_to_anchor=(1.02, 1),loc="upper left",fontsize=9)
+
+    plt.grid(alpha=0.3)
+    plt.tight_layout()
+
+    plot_path = RESULTS_DIR /"model_losses"/ "all_models_loss_comparison.png"
+
+    plt.savefig(plot_path,dpi=300,bbox_inches="tight")
+    plt.close()
+    print(f"Saved combined loss plot: {plot_path}")
+
 
 def main():
     print(f"Using device: {DEVICE}")
     print(f"Training {NUM_MODELS} neural networks")
     results = []
+    all_histories = []
     for model_number, seed in enumerate(SEEDS, start=1):
-        result = train_model(model_number, seed)
+        result, history = train_model(model_number, seed)
         results.append(result)
+        all_histories.append(history)
+
+    plot_all_model_histories(all_histories)
 
     summary_path = RESULTS_DIR / "ensemble_training_summary.csv"
-
     with open(summary_path, "w", newline="") as file:
 
         writer = csv.DictWriter(
