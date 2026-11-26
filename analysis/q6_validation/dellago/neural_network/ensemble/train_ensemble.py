@@ -24,9 +24,11 @@ BASE_DIR = Path(__file__).resolve().parent
 
 MODEL_DIR = BASE_DIR / "models"
 RESULTS_DIR = BASE_DIR / "results"
+LOSS_PLOTS_DIR = RESULTS_DIR / "model_losses"
 
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+LOSS_PLOTS_DIR.mkdir(parents=True, exist_ok=True)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -148,7 +150,7 @@ def plot_model_history(model_number,training_losses,validation_losses):
     plt.legend()
     plt.grid(alpha=0.3)
     plt.tight_layout()
-    plot_path = (RESULTS_DIR /"model_losses"/ f"model_{model_number:02d}_loss.png")
+    plot_path = (LOSS_PLOTS_DIR / f"model_{model_number:02d}_loss.png")
     plt.savefig(plot_path, dpi=300)
     plt.close()
     print(f"Saved Model {model_number} loss plot: {plot_path}")
@@ -195,7 +197,7 @@ def main():
 
     plot_all_model_histories(all_histories)
 
-    summary_path = RESULTS_DIR / "ensemble_training_summary.csv"
+    summary_path = LOSS_PLOTS_DIR / "ensemble_training_summary.csv"
     with open(summary_path, "w", newline="") as file:
 
         writer = csv.DictWriter(
